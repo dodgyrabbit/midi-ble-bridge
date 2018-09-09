@@ -21,7 +21,8 @@ Follow the instructions in the [installation guide](install.md)
 [Getting basics to work](blog/001-getting-anything-to-work.md)
 
 ## TODO
-- [ ] Communicate with BlueZ via D-Bus
+- [x] Communicate with BlueZ via D-Bus
+- [ ] Advertise a GATT MIDI service
 - [ ] Create a BLE service
 - [ ] Send basic MIDI command via BLE service
 - [ ] Figure out how to read MIDI messages from USB port
