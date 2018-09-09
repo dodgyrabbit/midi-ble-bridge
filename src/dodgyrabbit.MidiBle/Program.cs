@@ -19,8 +19,12 @@ namespace dodgyrabbit.MidiBle
                     Console.WriteLine("Connected"); 
 
                     var objectPath = new ObjectPath("/org/bluez/hci0");
-                    var service = "org.bluez.Adapter1";
+                    var service = "org.bluez";
                     var bluezService = connection.CreateProxy<IAdapter1>(service, objectPath);
+
+                    // The BlueZ sample code does this
+                    Console.WriteLine("Setting power to true on device 1");
+                    await bluezService.SetPoweredAsync(true);
                 }
             }).Wait();
         }

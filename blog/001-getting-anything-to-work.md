@@ -38,6 +38,39 @@ me@machine: src/dodgyrabbit.MidiBle$ dotnet dbus list objects --bus system --ser
 /org/bluez/hci0/dev_A0_6F_AA_3A_76_57 : org.bluez.Device1
 ```
 
-I guess **org.bluez.GattManager1** looks interesting...
+I guess **org.bluez.GattManager1** looks interesting... (tries to do stuff with it)
+then again maybe not.
+
+# Major lightbulb goes on moment
+
+Messing around with this stuff, you got confronted with weird errors, like
+
+```console
+IDI to BLE Bridge
+Connecting to System D-Bus...
+Connected
+Setting power to true on device 1
+
+Unhandled Exception: System.AggregateException: One or more errors occurred. (org.freedesktop.DBus.Error.ServiceUnknown: The name org.bluez.Adapter1 was not provided by any .service files) ---> Tmds.DBus.DBusException: org.freedesktop.DBus.Error.ServiceUnknown: The name org.bluez.Adapter1 was not provided by any .service files
+   at Tmds.DBus.DBusConnection.CallMethodAsync(Message msg, Boolean checkConnected, Boolean checkReplyType)
+   at Tmds.DBus.Connection.CallMethodAsync(Message message)
+   at Tmds.DBus.CodeGen.DBusObjectProxy.SendMethodReturnReaderAsync(String iface, String member, Nullable`1 inSignature, MessageWriter writer)
+   at dodgyrabbit.MidiBle.Program.<>c.<<Main>b__0_0>d.MoveNext() in /home/pieterventer/code/midi-ble-bridge/src/dodgyrabbit.MidiBle/Program.cs:line 28
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)   at System.Threading.Tasks.Task.Wait()
+   at dodgyrabbit.MidiBle.Program.Main(String[] args) in /home/pieterventer/code/midi-ble-bridge/src/dodgyrabbit.MidiBle/Program.cs:line 13
+```
+
+The main problem is that I'm not very familiar with D-Bus and I'm confusing **services** and **objects** and the way you address them. This how I discovered my mistake.
+
+There is a useful tool called d-feet that allows you to navigate the D-Bus hierarchy. I decided to review that against my code.
+![DFeet](images/001-d-feet.png)
+
+1. The **service identifier** is `org.bluez`. I thought there will be "different" ones for various parts of BlueZ, but it seems this is all I'm going to need.
+2. The **object identifier** is `/org/blue/hci0`. Notice the differences here. The service has dots between and the object paths have forward slashes. Note that you must start with a `/` otherwise you'll get an `ArgumentException` during the validation. That took me a minute or two to realize.
+3. The **properties** are exposed via the Interface that was automatically created by `dotnet dbus codegen` command earlier.
+
+Now I feel where getting somewhere!
+
 
 
