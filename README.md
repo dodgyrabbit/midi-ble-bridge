@@ -25,10 +25,10 @@ Follow the instructions in the [installation guide](install.md)
 - [ ] Create a BLE service
 - [ ] Send basic MIDI command via BLE service
 - [ ] Figure out how to read MIDI messages from USB port
-    https://github.com/atsushieno/managed-midi
-    https://dev.to/atsushieno/managed-midi-the-truly-cross-platform-net-midi-api-56hk
+      https://github.com/atsushieno/managed-midi
+      https://dev.to/atsushieno/managed-midi-the-truly-cross-platform-net-midi-api-56hk
 
-## Links that seem useful
+
 
 
 

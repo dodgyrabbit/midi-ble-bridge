@@ -17,3 +17,9 @@ org.freedesktop.UDisks2
 org.freedesktop.UPower
 org.gnome.DisplayManager
 ```
+Create the D-Bus objects
+```console
+me@machine: dodgyrabbit.MidiBle$ dotnet dbus codegen --bus system --service org.bluez
+Generated: src/dodgyrabbit.MidiBle/bluez.DBus.cs
+```
+
