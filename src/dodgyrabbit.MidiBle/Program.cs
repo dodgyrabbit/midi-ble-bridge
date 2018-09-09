@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using bluez.DBus;
 using Tmds.DBus;
 
 namespace dodgyrabbit.MidiBle
@@ -16,6 +17,10 @@ namespace dodgyrabbit.MidiBle
                 {
                     await connection.ConnectAsync();
                     Console.WriteLine("Connected"); 
+
+                    var objectPath = new ObjectPath("/org/bluez/hci0");
+                    var service = "org.bluez.Adapter1";
+                    var bluezService = connection.CreateProxy<IAdapter1>(service, objectPath);
                 }
             }).Wait();
         }
