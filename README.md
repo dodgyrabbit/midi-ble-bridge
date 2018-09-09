@@ -16,4 +16,7 @@ For now, I'm simply documenting my own setup to get things working. Hopefully I 
 ## Installation
 Follow the instructions in the [installation guide](install.md)
 
+## Blog
+
+[Getting basics to work](blog/001-getting-anything-to-work.md)
 
