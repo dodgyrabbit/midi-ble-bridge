@@ -40,12 +40,56 @@ namespace bluez.DBus
             get => _LocalName;
             set => _LocalName = value;
         }
+
+        string[] _ServiceUUIDs;
+
+        public string[] ServiceUUIDs 
+        {
+            get => _ServiceUUIDs;
+            set => _ServiceUUIDs = value;
+        }
+
+        bool? _Discoverable;
+
+        public bool? Discoverable
+        {
+            get => _Discoverable;
+            set => _Discoverable = value;
+        }
+
+        int? _Timeout;
+
+        public int? Timeout
+        {
+            get => _Timeout;
+            set => _Timeout = value;
+        }
+
+        UInt16? _Appearance;
+        public UInt16? Appearance
+        {
+            get => _Appearance;
+            set =>_Appearance = value;
+        }
+       
     }
 
     class LEAdvertisement : ILEAdvertisement1
     {
         ObjectPath myPath = new ObjectPath("/org/bluez/example/advertisement0");
         LEAdvertisementProperties _leadvertisementProperties;
+
+        public LEAdvertisementProperties LEAdvertisementProperties
+        {
+            get 
+            {
+                return _leadvertisementProperties;
+            }
+            set 
+            {
+                _leadvertisementProperties = value;
+            }
+        }
 
         public LEAdvertisement(LEAdvertisementProperties leadvertisementProperties) 
         {

@@ -27,7 +27,11 @@ namespace dodgyrabbit.MidiBle
                     Console.WriteLine("Setting power to true on device 1");
                     await hci0Adapter.SetPoweredAsync(true);
 
-                    var advertisement = new LEAdvertisement(new LEAdvertisementProperties {Type = "peripheral", LocalName="WHOHOO!"} );
+                    var advertisement = new LEAdvertisement(new LEAdvertisementProperties {Type = "peripheral", LocalName="MIDI-BRIDGE"} );
+                    advertisement.LEAdvertisementProperties.ServiceUUIDs = new string[] {"03B80E5A-EDE8-4B33-A751-6CE34EC4C700"};
+
+                    // Generic computer icon
+                    advertisement.LEAdvertisementProperties.Appearance = 0x0080;
 
                     // We need to register the LEAdvertisement object. This basically publishes the object
                     // so that when we get the DBus callback to read all the properties, we're good to go. 
