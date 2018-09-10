@@ -23,26 +23,20 @@ namespace dodgyrabbit.MidiBle
                     var serviceName = "org.bluez";
                     var hci0Adapter = connection.CreateProxy<IAdapter1>(serviceName, hci0Path);
 
-                    // Not needed, just trying it out
-                    var adapterProperties = await hci0Adapter.GetAllAsync();
-
                     // Based on BlueZ sample code. Verify what it does. Does it really turn my BT adapeter on if it was off?
                     Console.WriteLine("Setting power to true on device 1");
                     await hci0Adapter.SetPoweredAsync(true);
 
-                    // Based on BlueZ sample code. Can I make this anything?
-                    var advertisingPath = new ObjectPath("/org/bluez/example/advertisement0");
+                    var advertisement = new LEAdvertisement(new LEAdvertisementProperties {Type = "peripheral", LocalName="WHOHOO!"} );
 
-                    // This whole section is not right... just working on something
-                    var myAd = new Dictionary<string, object>();
-
-                    myAd["Type"] = "peripheral";
-                    myAd["LocalName"] = "dodgy";
+                    // We need to register the LEAdvertisement object. This basically publishes the object
+                    // so that when we get the DBus callback to read all the properties, we're good to go. 
+                    await connection.RegisterObjectAsync(advertisement);
 
                     var advertisingManager = connection.CreateProxy<ILEAdvertisingManager1>(serviceName, hci0Path);
-                    LEAdvertisingManager1Properties a = await advertisingManager.GetAllAsync();
+                    await advertisingManager.RegisterAdvertisementAsync(advertisement, new Dictionary<string, object>());
                     
-                    await Task.Delay(5000);
+                    await Task.Delay(10000);
                 }
             }).Wait();
         }

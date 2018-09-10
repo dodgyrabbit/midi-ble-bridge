@@ -12,6 +12,57 @@ namespace bluez.DBus
     interface ILEAdvertisement1 : IDBusObject
     {
         Task ReleaseAsync();
+
+         Task<LEAdvertisementProperties> GetAllAsync();
+    }
+
+    [Dictionary]
+    class LEAdvertisementProperties
+    {
+        private string _Type = default (string);
+        public string Type
+        {
+            get
+            {
+                return _Type;
+            }
+
+            set
+            {
+                _Type = (value);
+            }
+        }
+
+        private string _LocalName = default (string);
+
+        public string LocalName
+        {
+            get => _LocalName;
+            set => _LocalName = value;
+        }
+    }
+
+    class LEAdvertisement : ILEAdvertisement1
+    {
+        ObjectPath myPath = new ObjectPath("/org/bluez/example/advertisement0");
+        LEAdvertisementProperties _leadvertisementProperties;
+
+        public LEAdvertisement(LEAdvertisementProperties leadvertisementProperties) 
+        {
+            _leadvertisementProperties = leadvertisementProperties;
+        }
+
+        public ObjectPath ObjectPath => myPath;
+
+        public async Task<LEAdvertisementProperties> GetAllAsync()
+        {
+            return _leadvertisementProperties;
+        }
+
+        public async Task ReleaseAsync()
+        {
+            Console.WriteLine("Object released");
+        }
     }
 
 
@@ -271,7 +322,7 @@ namespace bluez.DBus
     [DBusInterface("org.bluez.LEAdvertisingManager1")]
     interface ILEAdvertisingManager1 : IDBusObject
     {
-        Task RegisterAdvertisementAsync(ObjectPath Advertisement, IDictionary<string, object> Options);
+        Task RegisterAdvertisementAsync(ILEAdvertisement1 Advertisement, IDictionary<string, object> Options);
         Task UnregisterAdvertisementAsync(ObjectPath Service);
         Task<T> GetAsync<T>(string prop);
         Task<LEAdvertisingManager1Properties> GetAllAsync();
