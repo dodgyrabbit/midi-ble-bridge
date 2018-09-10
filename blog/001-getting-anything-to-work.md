@@ -43,7 +43,7 @@ then again maybe not.
 
 # Major lightbulb goes on moment
 
-Messing around with this stuff, you got confronted with weird errors, like
+Messing around with this stuff, you get confronted with weird errors, like
 
 ```console
 IDI to BLE Bridge
@@ -72,5 +72,18 @@ There is a useful tool called d-feet that allows you to navigate the D-Bus hiera
 
 Now I feel where getting somewhere!
 
+## Not for too long!
 
+OK so I hit another snag...
 
+I can't seem to locate the 'org.bluez.LEAdvertisement1' interface and it should be there.
+https://stackoverflow.com/a/41398903
+
+Some kind of voodoo going on here.
+I tried to make sure that the --experimental was turned on, that took a whole different detour.
+https://learn.adafruit.com/install-bluez-on-the-raspberry-pi/installation#enable-bluetooth-low-energy-features
+
+But I swear it was working with the python examples. How could that be???
+
+Either that Interface is not advertised (but it works) OR python code is not using the same bluetoothd??
+Let me run it again and see.

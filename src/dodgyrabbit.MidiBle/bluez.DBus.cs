@@ -7,6 +7,14 @@ using Tmds.DBus;
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
 namespace bluez.DBus
 {
+
+    [DBusInterface("org.bluez.LEAdvertisement1")]
+    interface ILEAdvertisement1 : IDBusObject
+    {
+        Task ReleaseAsync();
+    }
+
+
     [DBusInterface("org.freedesktop.DBus.ObjectManager")]
     interface IObjectManager : IDBusObject
     {
