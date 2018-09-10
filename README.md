@@ -1,7 +1,7 @@
 # MIDI to BLE bridge
 ## Overview
 A MIDI to Bluetooth Low Energy bridge written in C# running on Linux using .Net Core.
-It uses the [BlueZ](www.bluez.org) protocol stack to communicate with the Bluetooth device on your machine.
+cIt uses the [BlueZ](https://git.kernel.org/pub/scm/bluetooth/bluez.git) protocol stack to communicate with the Bluetooth device on your machine.
 BlueZ exposes the required functionality via [D-Bus](https://www.freedesktop.org/wiki/Software/dbus/).
 Access to D-Bus has been simplified and modernised (async model) by [Tmds.DBus](https://github.com/tmds/Tmds.DBus).
 
