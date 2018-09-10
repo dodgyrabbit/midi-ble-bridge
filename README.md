@@ -17,19 +17,17 @@ For now, I'm simply documenting my own setup to get things working. Hopefully I 
 Follow the instructions in the [installation guide](install.md)
 
 ## Blog
+My crude collection of notes on how this is progressing, what I tried, what failed and so forth.
 
-[Getting basics to work](blog/001-getting-anything-to-work.md)
+* 10 Sep 2018 [Who wants to ride DBus?](blog/002-understanding-dbus.md)
+* 9 Sep 2018 [Basics](blog/001-getting-anything-to-work.md)
 
 ## TODO
 - [x] Communicate with BlueZ via D-Bus
-- [ ] Advertise a GATT MIDI service
+- [x] Get a basic GATT advertisement working
+- [ ] Advertise remaining GATT service properties
 - [ ] Create a BLE service
 - [ ] Send basic MIDI command via BLE service
 - [ ] Figure out how to read MIDI messages from USB port
       https://github.com/atsushieno/managed-midi
       https://dev.to/atsushieno/managed-midi-the-truly-cross-platform-net-midi-api-56hk
-
-
-
-
-

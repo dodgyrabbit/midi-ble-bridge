@@ -1,4 +1,4 @@
-# Getting anything to work
+# Basics
 
 * Got the basic console app created and it can build.
 * Added DBus library.
@@ -41,7 +41,7 @@ me@machine: src/dodgyrabbit.MidiBle$ dotnet dbus list objects --bus system --ser
 I guess **org.bluez.GattManager1** looks interesting... (tries to do stuff with it)
 then again maybe not.
 
-# Major lightbulb goes on moment
+# Major lightbulb moment
 
 Messing around with this stuff, you get confronted with weird errors, like
 

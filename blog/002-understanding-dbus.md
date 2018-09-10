@@ -1,4 +1,4 @@
-# Understanding DBus
+# Riding DBus
 I was hoping that this stuff is really abstracted away, but I guess you need to know a bit more of what's going on.
 
 ## Sending an object
