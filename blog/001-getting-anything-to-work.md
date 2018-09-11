@@ -87,3 +87,44 @@ But I swear it was working with the python examples. How could that be???
 
 Either that Interface is not advertised (but it works) OR python code is not using the same bluetoothd??
 Let me run it again and see.
+
+## Breakthrough?
+
+The reason the interface is not being returned... looking in the BlueZ source I found this:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=933a25965a03bcf8e83c39a60523c608fa9c6bd9
+
+What is this? Some kind of config file that denies it.
+
+I searched and in the code I compiled it was ok...
+
+BUT looking on my machine I found this:
+
+```console
+File: /etc/dbus-1/system.d/bluetooth.conf
+───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ <!-- This configuration file specifies the required security policies
+   2   │      for Bluetooth core daemon to work. -->
+   3   │ 
+   4   │ <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+   5   │  "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+   6   │ <busconfig>
+   7   │ 
+   8   │   <!-- ../system.conf have denied everything, so we just punch some holes -->
+   9   │ 
+  10   │   <policy user="root">
+  11   │     <allow own="org.bluez"/>
+  12   │     <allow send_destination="org.bluez"/>
+  13   │     <allow send_interface="org.bluez.Agent1"/>
+  14   │     <allow send_interface="org.bluez.MediaEndpoint1"/>
+  15   │     <allow send_interface="org.bluez.MediaPlayer1"/>
+  16   │     <allow send_interface="org.bluez.Profile1"/>
+  17   │     <allow send_interface="org.bluez.GattCharacteristic1"/>
+  18   │     <allow send_interface="org.bluez.GattDescriptor1"/>
+  19   │     <allow send_interface="org.bluez.LEAdvertisement1"/>
+  20   │     <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+  21   │     <allow send_interface="org.freedesktop.DBus.Properties"/>
+  22   │   </policy>
+```
+which corresponds to the interfaces I'm seeing in D-Feet.
+It is not allowing the `org.bluez.LEAdvertisement1` interface!
+
