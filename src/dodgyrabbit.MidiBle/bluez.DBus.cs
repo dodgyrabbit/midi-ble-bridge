@@ -65,7 +65,6 @@ namespace bluez.DBus
         }
     }
 
-
     [DBusInterface("org.freedesktop.DBus.ObjectManager")]
     interface IObjectManager : IDBusObject
     {
