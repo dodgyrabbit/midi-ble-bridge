@@ -58,9 +58,27 @@ class Application(dbus.service.Object):
 
     @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
     def GetManagedObjects(self):
+        """
+        Returns the Managed Objects contained by this Application instance.
+        Returns
+        -------
+        dictionary
+            A dictionary where the key is the object path, and the value is a dictionary of string/values.
+        """
+
         response = {}
         print('GetManagedObjects')
 
+        # The Application object has hierarchy as follows:
+        # Application
+        # --> Services[]
+        # -----> Characteristics[]
+        # ---------> Descriptors[]
+        # 
+        # Each of these are identified by an object path.
+        # This method will iterate over each of these objects, starting with the services and traversing down
+        # the hierarchy. It creates a Key/Value dictionary where the Key is the object path and the value
+        # is a dictionary of Key/Values that represents the properties for that object.
         for service in self.services:
             response[service.get_path()] = service.get_properties()
             chrcs = service.get_characteristics()
@@ -247,7 +265,6 @@ class HeartRateService(Service):
     """
     Fake Heart Rate Service that simulates a fake heart beat and control point
     behavior.
-
     """
     HR_UUID = '0000180d-0000-1000-8000-00805f9b34fb'
 
@@ -321,8 +338,7 @@ def register_app_error_cb(error):
     mainloop.quit()
 
 def find_adapter(bus):
-    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
-                               DBUS_OM_IFACE)
+    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
     objects = remote_om.GetManagedObjects()
 
     for o, props in objects.items():
@@ -342,19 +358,21 @@ def main():
         print('GattManager1 interface not found')
         return
 
-    service_manager = dbus.Interface(
-            bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-            GATT_MANAGER_IFACE)
+    service_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter), GATT_MANAGER_IFACE)
 
+    # At the root we need to publish an object that implements "org.freedesktop.DBus.ObjectManager" which has one method
+    # GetManagedObjects. The Application object is the one that will be exposed and the GattManager1 Interface
+    # above will be used to register the Application object.
     app = Application(bus)
 
     mainloop = GObject.MainLoop()
 
     print('Registering GATT application...')
 
-    service_manager.RegisterApplication(app.get_path(), {},
-                                    reply_handler=register_app_cb,
-                                    error_handler=register_app_error_cb)
+    # When you Register the application, you exect that you'll be called back at a later time to enumerate the objects
+    # exposed by Application.GetManagedOjects. Note that everything here is asynchronous, so that is why we have
+    # callbacks that can let us know if a problem occured.
+    service_manager.RegisterApplication(app.get_path(), {}, reply_handler=register_app_cb, error_handler=register_app_error_cb)
 
     mainloop.run()
 

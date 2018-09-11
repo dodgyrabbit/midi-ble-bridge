@@ -29,7 +29,7 @@ properties defined in GattService1 interface.
 * Interface	`org.bluez.GattService1`
 * Object path	`[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX`
 
-	Properties	
+		Properties	
 		string UUID [read-only]
 
 			128-bit service UUID.
@@ -61,7 +61,8 @@ Service		org.bluez
 Interface	org.bluez.GattCharacteristic1
 Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
 
-Methods		array{byte} ReadValue(dict options)
+	Methods		
+			array{byte} ReadValue(dict options)
 
 			Issues a request to read the value of the
 			characteristic and returns the value if the
@@ -190,7 +191,8 @@ Methods		array{byte} ReadValue(dict options)
 
 			Possible Errors: org.bluez.Error.Failed
 
-Properties	string UUID [read-only]
+	Properties	
+		string UUID [read-only]
 
 			128-bit characteristic UUID.
 
@@ -266,7 +268,7 @@ Service		org.bluez
 Interface	org.bluez.GattDescriptor1
 Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
 
-Methods		array{byte} ReadValue(dict flags)
+	Methods		array{byte} ReadValue(dict flags)
 
 			Issues a request to read the value of the
 			characteristic and returns the value if the
@@ -301,7 +303,7 @@ Methods		array{byte} ReadValue(dict flags)
 					 org.bluez.Error.NotAuthorized
 					 org.bluez.Error.NotSupported
 
-Properties	string UUID [read-only]
+	Properties	string UUID [read-only]
 
 			128-bit descriptor UUID.
 
@@ -340,9 +342,9 @@ an application effectively indicates support for a specific GATT profile
 and requests automatic connections to be established to devices
 supporting it.
 
-Service		<application dependent>
-Interface	org.bluez.GattProfile1
-Object path	<application dependent>
+* Service		`<application dependent>`
+* Interface	`org.bluez.GattProfile1`
+* Object path	`<application dependent>`
 
 Methods		void Release()
 
@@ -382,32 +384,32 @@ the objects of that service. Hence, the standard DBus.ObjectManager interface
 must be available on the root service path. An example application hierarchy
 containing two separate GATT services may look like this:
 
--> /com/example
-  |   - org.freedesktop.DBus.ObjectManager
-  |
-  -> /com/example/service0
-  | |   - org.freedesktop.DBus.Properties
-  | |   - org.bluez.GattService1
-  | |
-  | -> /com/example/service0/char0
-  | |     - org.freedesktop.DBus.Properties
-  | |     - org.bluez.GattCharacteristic1
-  | |
-  | -> /com/example/service0/char1
-  |   |   - org.freedesktop.DBus.Properties
-  |   |   - org.bluez.GattCharacteristic1
-  |   |
-  |   -> /com/example/service0/char1/desc0
-  |       - org.freedesktop.DBus.Properties
-  |       - org.bluez.GattDescriptor1
-  |
-  -> /com/example/service1
-    |   - org.freedesktop.DBus.Properties
-    |   - org.bluez.GattService1
-    |
-    -> /com/example/service1/char0
-        - org.freedesktop.DBus.Properties
-        - org.bluez.GattCharacteristic1
+	-> /com/example
+	|   - org.freedesktop.DBus.ObjectManager
+	|
+	-> /com/example/service0
+	| |   - org.freedesktop.DBus.Properties
+	| |   - org.bluez.GattService1
+	| |
+	| -> /com/example/service0/char0
+	| |     - org.freedesktop.DBus.Properties
+	| |     - org.bluez.GattCharacteristic1
+	| |
+	| -> /com/example/service0/char1
+	|   |   - org.freedesktop.DBus.Properties
+	|   |   - org.bluez.GattCharacteristic1
+	|   |
+	|   -> /com/example/service0/char1/desc0
+	|       - org.freedesktop.DBus.Properties
+	|       - org.bluez.GattDescriptor1
+	|
+	-> /com/example/service1
+		|   - org.freedesktop.DBus.Properties
+		|   - org.bluez.GattService1
+		|
+		-> /com/example/service1/char0
+			- org.freedesktop.DBus.Properties
+			- org.bluez.GattCharacteristic1
 
 When a service is registered, BlueZ will automatically obtain information about
 all objects using the service's Object Manager. Once a service has been
@@ -417,7 +419,7 @@ unregister the service. Similarly, if the application disconnects from the bus,
 all of its registered services will be automatically unregistered.
 InterfacesAdded signals will be ignored.
 
-Examples:
+	Examples:
 	- Client
 		test/example-gatt-client
 		client/bluetoothctl
@@ -426,11 +428,12 @@ Examples:
 		tools/gatt-service
 
 
-Service		org.bluez
-Interface	org.bluez.GattManager1
-Object path	[variable prefix]/{hci0,hci1,...}
+* Service		`org.bluez`
+* Interface	`org.bluez.GattManager1`
+* Object path	`[variable prefix]/{hci0,hci1,...}`
 
-Methods		void RegisterApplication(object application, dict options)
+	Methods
+	void RegisterApplication(object application, dict options)
 
 			Registers a local GATT services hierarchy as described
 			above (GATT Server) and/or GATT profiles (GATT Client).
