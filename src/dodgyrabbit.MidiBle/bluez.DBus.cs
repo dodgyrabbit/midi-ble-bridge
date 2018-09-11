@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using dodgyrabbit.MidiBle;
 using Tmds.DBus;
 
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
@@ -358,7 +359,7 @@ namespace bluez.DBus
     [DBusInterface("org.bluez.GattManager1")]
     interface IGattManager1 : IDBusObject
     {
-        Task RegisterApplicationAsync(ObjectPath Application, IDictionary<string, object> Options);
+        Task RegisterApplicationAsync(Application Application, IDictionary<string, object> Options);
         Task UnregisterApplicationAsync(ObjectPath Application);
     }
 

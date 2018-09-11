@@ -44,6 +44,12 @@ namespace dodgyrabbit.MidiBle
                     // 1. Export a D-BUS Object Manager at root that is responsible for it's objects
                     // 2. Register the service using the "org.bluez.GattService1" Interface
 
+                    Application application = new Application(new ObjectPath(@"/abc/def"));
+                    var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/"));
+
+                    await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
+                    //gattManager.RegisterApplicationAsync()
+
                     await Task.Delay(10000);
                 }
             }).Wait();
