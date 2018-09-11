@@ -40,6 +40,10 @@ namespace dodgyrabbit.MidiBle
                     var advertisingManager = connection.CreateProxy<ILEAdvertisingManager1>(serviceName, hci0Path);
                     await advertisingManager.RegisterAdvertisementAsync(advertisement, new Dictionary<string, object>());
                     
+                    // TODO:
+                    // 1. Export a D-BUS Object Manager at root that is responsible for it's objects
+                    // 2. Register the service using the "org.bluez.GattService1" Interface
+
                     await Task.Delay(10000);
                 }
             }).Wait();
