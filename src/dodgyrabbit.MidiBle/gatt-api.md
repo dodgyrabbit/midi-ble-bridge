@@ -264,9 +264,9 @@ Characteristic Descriptors hierarchy
 
 Local or remote GATT characteristic descriptors hierarchy.
 
-Service		org.bluez
-Interface	org.bluez.GattDescriptor1
-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
+* Service		`org.bluez`
+* Interface	`org.bluez.GattDescriptor1`
+* Object path	`[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ`
 
 	Methods		array{byte} ReadValue(dict flags)
 
