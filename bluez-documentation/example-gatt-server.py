@@ -135,6 +135,7 @@ class Service(dbus.service.Object):
                          in_signature='s',
                          out_signature='a{sv}')
     def GetAll(self, interface):
+        print ("** GetAll being called on service **")
         if interface != GATT_SERVICE_IFACE:
             raise InvalidArgsException()
 

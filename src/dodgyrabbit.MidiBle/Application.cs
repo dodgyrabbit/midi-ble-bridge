@@ -52,7 +52,14 @@ namespace dodgyrabbit.MidiBle
             IDictionary<string, object> innerMost = new Dictionary<string, object>();
             IDictionary<string, IDictionary<string, object>> inner = new Dictionary<string, IDictionary<string, object>>();
 
-            ObjectPath op = new ObjectPath("/com/example");
+            innerMost["UUID"] = "00002a37-0000-1000-8000-00805f9b34fb";
+            innerMost["Service"] = "/org/bluez/example/service0";
+            innerMost["Flags"] = new string[] {"Notify"};
+            innerMost["Descriptors"] = new string[0];
+
+            inner["org.bluez.GattCharacteristic1"] = innerMost;
+
+            ObjectPath op = new ObjectPath("/org/bluez/example/service0/char0");
 
             var dict = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
             dict[op] = inner;
