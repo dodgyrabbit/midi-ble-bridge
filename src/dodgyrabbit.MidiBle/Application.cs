@@ -19,7 +19,23 @@ namespace dodgyrabbit.MidiBle
     //  Currently getting a serialization error.
     //  Do we seperate out the interface from the class? Maybe that is a critical part of how the DBus plumbing works
 
-    [Dictionary]
+    // Tried a bunch of things, getting error now:
+    // Tmds.DBus.DBusException: org.bluez.Error.Failed: No object received
+    // This looks like it's happening from bluetoothd (prior to DBus?) as it's not yet on DBus
+    // sudo btmon
+    // Enable verbose logging probably required:
+    // https://stackoverflow.com/questions/37003147/i-want-to-enable-debug-messages-on-bluez
+    // https://wiki.ubuntu.com/DebuggingBluetooth
+    
+    public class dummy : IDisposable
+    {
+        public void Dispose()
+        {
+            
+        }
+    }
+
+    //[DBusInterface("org.freedesktop.DBus.ObjectManager")]
     public class Application : IObjectManager
     {
         ObjectPath objectPath;
@@ -30,22 +46,34 @@ namespace dodgyrabbit.MidiBle
 
         public ObjectPath ObjectPath => objectPath;
 
-        public Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
+        public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             Console.WriteLine("Got this far!");
-            return null;
+            IDictionary<string, object> innerMost = new Dictionary<string, object>();
+            IDictionary<string, IDictionary<string, object>> inner = new Dictionary<string, IDictionary<string, object>>();
+
+            ObjectPath op = new ObjectPath("/com/example");
+
+            var dict = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
+            dict[op] = inner;
+
+            return dict;
+            //return new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
+            //return await Task.Run<Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>>(null, null);
         }
 
-        Task<IDisposable> IObjectManager.WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
+        
+
+        public async Task<IDisposable>  WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
         {
             Console.WriteLine("WatchInterfacesAdded called");
-            return null;
+            return new dummy();
         }
 
-        Task<IDisposable> IObjectManager.WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
+        public async Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
         {
              Console.WriteLine("WatchInterfacesRemoved called");
-            return null;
+            return new dummy();
         }
     }
 }

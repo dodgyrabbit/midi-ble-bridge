@@ -359,7 +359,7 @@ namespace bluez.DBus
     [DBusInterface("org.bluez.GattManager1")]
     interface IGattManager1 : IDBusObject
     {
-        Task RegisterApplicationAsync(Application Application, IDictionary<string, object> Options);
+        Task RegisterApplicationAsync(IObjectManager Application, IDictionary<string, object> Options);
         Task UnregisterApplicationAsync(ObjectPath Application);
     }
 
