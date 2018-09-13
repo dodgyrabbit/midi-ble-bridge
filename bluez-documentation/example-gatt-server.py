@@ -131,9 +131,7 @@ class Service(dbus.service.Object):
     def get_characteristics(self):
         return self.characteristics
 
-    @dbus.service.method(DBUS_PROP_IFACE,
-                         in_signature='s',
-                         out_signature='a{sv}')
+    @dbus.service.method(DBUS_PROP_IFACE, in_signature='s', out_signature='a{sv}')
     def GetAll(self, interface):
         print ("** GetAll being called on service **")
         if interface != GATT_SERVICE_IFACE:
