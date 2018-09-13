@@ -48,25 +48,26 @@ namespace dodgyrabbit.MidiBle
 
         public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
-            Console.WriteLine("Got this far!");
-            IDictionary<string, object> innerMost = new Dictionary<string, object>();
-            IDictionary<string, IDictionary<string, object>> inner = new Dictionary<string, IDictionary<string, object>>();
+            var result = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
+            IDictionary<string, IDictionary<string, object>> service = new Dictionary<string, IDictionary<string, object>>();
+            IDictionary<string, IDictionary<string, object>> service2 = new Dictionary<string, IDictionary<string, object>>();
 
-            innerMost["UUID"] = "00002a37-0000-1000-8000-00805f9b34fb";
-            innerMost["Service"] = "/org/bluez/example/service0";
-            innerMost["Flags"] = new string[] {"Notify"};
-            innerMost["Descriptors"] = new string[0];
+            IDictionary<string, object> serviceCharacteristics = new Dictionary<string, object>();
+            serviceCharacteristics["UUID"] = "00002a37-0000-1000-8000-00805f9b34fb";
+            serviceCharacteristics["Service"] = new ObjectPath("/org/bluez/example/service0");
+            serviceCharacteristics["Flags"] = new string[] {"notify"};
+            serviceCharacteristics["Descriptors"] = new Object[] {};
+            service["org.bluez.GattCharacteristic1"] = serviceCharacteristics;
 
-            inner["org.bluez.GattCharacteristic1"] = innerMost;
+            IDictionary<string, object> service0 = new Dictionary<string, object>();
+            service0["Characteristics"] = new ObjectPath[] {new ObjectPath("/org/bluez/example/service0/char0")};
+            service0["UUID"] = "0000180d-0000-1000-8000-00805f9b34fb";
+            service0["Primary"] = true;
+            service2["org.bluez.GattService1"] = service0;
 
-            ObjectPath op = new ObjectPath("/org/bluez/example/service0/char0");
-
-            var dict = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
-            dict[op] = inner;
-
-            return dict;
-            //return new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
-            //return await Task.Run<Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>>(null, null);
+            result[new ObjectPath("/org/bluez/example/service0/char0")] = service;
+            result[new ObjectPath("/org/bluez/example/service0")] = service2;
+            return result;
         }
 
         
