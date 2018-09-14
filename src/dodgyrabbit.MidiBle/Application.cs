@@ -28,15 +28,29 @@ namespace dodgyrabbit.MidiBle
 
     public class Application : IObjectManager
     {
+        string basePath;
         ObjectPath objectPath;
-        public Application(ObjectPath objectPath)
+        public Application(string path)
         {
-            this.objectPath = objectPath;
+            // We need to create services as children of this, so keep reference to the orignal string path
+            this.basePath = path;
+            this.objectPath = new ObjectPath(basePath);
         }
 
         public ObjectPath ObjectPath => objectPath;
 
-        public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
+/// <summary>
+/// An API can optionally make use of this interface for one or more sub-trees of objects. The root of each sub-tree implements this interface so other applications can get all objects, interfaces and properties in a single method call. It is appropriate to use this interface if users of the tree of objects are expected to be interested in all interfaces of all objects in the tree; a more granular API should be used if users of the objects are expected to be interested in a small subset of the objects, a small subset of their interfaces, or both.
+/// The method that applications can use to get all objects and properties is GetManagedObjects:
+///
+///  org.freedesktop.DBus.ObjectManager.GetManagedObjects (out DICT <OBJPATH,DICT <STRING,DICT<STRING,VARIANT>>> objpath_interfaces_and_properties);
+///
+/// The return value of this method is a dict whose keys are object paths. All returned object paths are children of the object path implementing this interface, i.e. their object paths start with the ObjectManager's object path plus '/'.
+///
+/// Each value is a dict whose keys are interfaces names. Each value in this inner dict is the same dict that would be returned by the org.freedesktop.DBus.Properties.GetAll() method for that combination of object path and interface. If an interface has no properties, the empty dict is returned.
+/// </summary>
+/// <returns></returns>
+        public Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             var objects = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
             IDictionary<string, IDictionary<string, object>> service = new Dictionary<string, IDictionary<string, object>>();
@@ -57,21 +71,29 @@ namespace dodgyrabbit.MidiBle
             serviceDetails["Primary"] = true;
             service["org.bluez.GattService1"] = serviceDetails;
 
+            GattService1 gattService = new GattService1("/org/bluez/example/service0");
+            gattService.GetInterfaceName();
+            // objects[gattService.ObjectPath] = new Dictionary<string, IDictionary<string, object>>()
+            //     {
+            //         {gattService.GetInterfaceName(), await gattService.GetAllAsync()}
+            //     };
+            //gattService.GetAllAsync
+
             objects[new ObjectPath("/org/bluez/example/service0/char0")] = serviceCharacteristic;
             objects[new ObjectPath("/org/bluez/example/service0")] = service;
-            return objects;
+            return Task.FromResult(objects as IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>);
         }
 
-        public async Task<IDisposable>  WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
+        public Task<IDisposable>  WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
         {
             Console.WriteLine("WatchInterfacesAdded called");
-            return new dummy();
+            return Task.FromResult(new dummy() as IDisposable);
         }
 
-        public async Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
+        public  Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
         {
              Console.WriteLine("WatchInterfacesRemoved called");
-            return new dummy();
+            return Task.FromResult(new dummy() as IDisposable);
         }
     }
 }

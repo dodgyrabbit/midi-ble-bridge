@@ -45,7 +45,7 @@ namespace dodgyrabbit.MidiBle
                     // 2. Register the service using the "org.bluez.GattService1" Interface
 
 
-                    Application application = new Application(new ObjectPath(@"/com/example"));
+                    Application application = new Application(@"/com/example");
 
 
 

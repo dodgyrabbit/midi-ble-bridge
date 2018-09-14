@@ -99,14 +99,15 @@ namespace bluez.DBus
 
         public ObjectPath ObjectPath => myPath;
 
-        public async Task<LEAdvertisementProperties> GetAllAsync()
+        public Task<LEAdvertisementProperties> GetAllAsync()
         {
-            return _leadvertisementProperties;
+            return Task.FromResult(_leadvertisementProperties);
         }
 
-        public async Task ReleaseAsync()
+        public Task ReleaseAsync()
         {
             Console.WriteLine("Object released");
+            return Task.CompletedTask;
         }
     }
 

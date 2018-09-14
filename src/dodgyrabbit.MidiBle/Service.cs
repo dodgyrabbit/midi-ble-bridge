@@ -4,14 +4,15 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace dodgyrabbit.MidiBle
 {
     [DBusInterface("org.bluez.GattService1")]
-    public class Service : IDBusObject
+    public class GattService1 : IDBusObject
     {
         ObjectPath objectPath;
-        public Service(ObjectPath objectPath)
+        public GattService1(ObjectPath objectPath)
         {
             this.objectPath = objectPath;
         }
@@ -24,7 +25,7 @@ namespace dodgyrabbit.MidiBle
         /// Inspects the current type and returns the DBusInterface.
         /// </summary>
         /// <returns>The DBusInterface Name as decorated by the DBusInterfaceAttribute.</returns>
-        protected string GetInterfaceName()
+        public string GetInterfaceName()
         {
             Attribute attribute = this.GetType().GetCustomAttribute(typeof(DBusInterfaceAttribute));
             DBusInterfaceAttribute dBusInterface = attribute as DBusInterfaceAttribute;
@@ -42,9 +43,8 @@ namespace dodgyrabbit.MidiBle
     }
 
     [Dictionary]
-    public class ServiceProperties
+    public class ServiceProperties 
     {
-
     }
 
 }
