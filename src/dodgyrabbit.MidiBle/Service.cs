@@ -9,17 +9,27 @@ using System.Collections;
 namespace dodgyrabbit.MidiBle
 {
     [DBusInterface("org.bluez.GattService1")]
-    public class GattService1 : IDBusObject
+    public class GattService1 : IDBusObject, IGattService1
     {
         ObjectPath objectPath;
-        public GattService1(ObjectPath objectPath)
+        public GattService1(ObjectPath objectPath, string UUID, Boolean primary)
         {
             this.objectPath = objectPath;
+            this.UUID = UUID;
+            this.Primary = primary;
         }
 
+        /// <summary>
+        /// 128-bit service UUID. Read only.
+        /// </summary>
+        public string UUID { get; private set; }
+
+        /// <summary>
+        /// Indicates whether or not this GATT service is a primary service. If false, the service is secondary.
+        /// </summary>
+        public bool Primary { get; private set; }
+
         public ObjectPath ObjectPath => objectPath;
-        // TODO: Return the required dictionary object here.
-        // TODO: Create interface for GattService1. Implement it here.
 
         /// <summary>
         /// Inspects the current type and returns the DBusInterface.
@@ -36,15 +46,15 @@ namespace dodgyrabbit.MidiBle
             return dBusInterface.Name;
         }
 
-        public Task<ServiceProperties> GetAllAsync()
+        public Task<IDictionary<string, object>> GetAllAsync()
         {
-            return null;
+            return Task.FromResult<IDictionary<string, object>>(
+                new Dictionary<string, object>()
+                {
+                    { nameof(UUID), UUID},
+                    { nameof(Primary), Primary}
+                });
         }
-    }
-
-    [Dictionary]
-    public class ServiceProperties 
-    {
     }
 
 }

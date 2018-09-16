@@ -30,11 +30,17 @@ namespace dodgyrabbit.MidiBle
     {
         string basePath;
         ObjectPath objectPath;
+        List<GattService1> services = new List<GattService1>();
         public Application(string path)
         {
             // We need to create services as children of this, so keep reference to the orignal string path
             this.basePath = path;
             this.objectPath = new ObjectPath(basePath);
+        }
+
+        public void AddService(GattService1 service)
+        {
+            services.Add(service);
         }
 
         public ObjectPath ObjectPath => objectPath;
@@ -50,7 +56,7 @@ namespace dodgyrabbit.MidiBle
 /// Each value is a dict whose keys are interfaces names. Each value in this inner dict is the same dict that would be returned by the org.freedesktop.DBus.Properties.GetAll() method for that combination of object path and interface. If an interface has no properties, the empty dict is returned.
 /// </summary>
 /// <returns></returns>
-        public Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
+        public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             var objects = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
             IDictionary<string, IDictionary<string, object>> service = new Dictionary<string, IDictionary<string, object>>();
@@ -71,8 +77,11 @@ namespace dodgyrabbit.MidiBle
             serviceDetails["Primary"] = true;
             service["org.bluez.GattService1"] = serviceDetails;
 
-            GattService1 gattService = new GattService1("/org/bluez/example/service0");
-            gattService.GetInterfaceName();
+            foreach(GattService1 svc in services)
+            {
+                service[svc.GetInterfaceName()] = await svc.GetAllAsync();
+            }
+
             // objects[gattService.ObjectPath] = new Dictionary<string, IDictionary<string, object>>()
             //     {
             //         {gattService.GetInterfaceName(), await gattService.GetAllAsync()}
@@ -81,7 +90,7 @@ namespace dodgyrabbit.MidiBle
 
             objects[new ObjectPath("/org/bluez/example/service0/char0")] = serviceCharacteristic;
             objects[new ObjectPath("/org/bluez/example/service0")] = service;
-            return Task.FromResult(objects as IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>);
+            return objects as IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>;
         }
 
         public Task<IDisposable>  WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
