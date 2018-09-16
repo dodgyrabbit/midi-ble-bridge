@@ -59,7 +59,7 @@ namespace dodgyrabbit.MidiBle
         public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             var objects = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
-            IDictionary<string, IDictionary<string, object>> service = new Dictionary<string, IDictionary<string, object>>();
+            
 
             IDictionary<string, IDictionary<string, object>> serviceCharacteristic = new Dictionary<string, IDictionary<string, object>>();
             IDictionary<string, object> serviceCharacteristics = new Dictionary<string, object>();
@@ -75,11 +75,24 @@ namespace dodgyrabbit.MidiBle
             // Heart rate service
             serviceDetails["UUID"] = "0000180d-0000-1000-8000-00805f9b34fb";
             serviceDetails["Primary"] = true;
-            service["org.bluez.GattService1"] = serviceDetails;
 
-            foreach(GattService1 svc in services)
+            foreach(GattService1 service in services)
             {
-                service[svc.GetInterfaceName()] = await svc.GetAllAsync();
+                IDictionary<string, IDictionary<string, object>> serviceDictionary = new Dictionary<string, IDictionary<string, object>>();
+                serviceDictionary[service.GetInterfaceName()] = await service.GetAllAsync();
+
+                objects[new ObjectPath("/org/bluez/example/service0")] = serviceDictionary;
+
+                foreach (GattCharacteristic1 characteristic in service.GetCharacteristics())
+                {
+                    IDictionary<string, IDictionary<string, object>> characteristics = new Dictionary<string, IDictionary<string, object>>();
+                    // TODO: helper to get object identifier here
+                    characteristics[""] = await characteristic.GetAllAsync();
+
+                // TODO: Need to lookup characteristic path
+                objects["/org/bluez/example/service0/char0"] = characteristics;
+
+                }
             }
 
             // objects[gattService.ObjectPath] = new Dictionary<string, IDictionary<string, object>>()
@@ -88,8 +101,8 @@ namespace dodgyrabbit.MidiBle
             //     };
             //gattService.GetAllAsync
 
-            objects[new ObjectPath("/org/bluez/example/service0/char0")] = serviceCharacteristic;
-            objects[new ObjectPath("/org/bluez/example/service0")] = service;
+            // objects[new ObjectPath("/org/bluez/example/service0/char0")] = serviceCharacteristic;
+            // objects[new ObjectPath("/org/bluez/example/service0")] = service;
             return objects as IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>;
         }
 

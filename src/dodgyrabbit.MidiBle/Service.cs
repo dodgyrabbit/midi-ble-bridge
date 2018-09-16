@@ -12,11 +12,22 @@ namespace dodgyrabbit.MidiBle
     public class GattService1 : IDBusObject, IGattService1
     {
         ObjectPath objectPath;
+        List<GattCharacteristic1> gattCharacteristics = new List<GattCharacteristic1>();
         public GattService1(ObjectPath objectPath, string UUID, Boolean primary)
         {
             this.objectPath = objectPath;
             this.UUID = UUID;
             this.Primary = primary;
+        }
+
+        public void AddCharacteristic(GattCharacteristic1 characteristic)
+        {
+            this.gattCharacteristics.Add(characteristic);
+        }
+
+        public IEnumerable<GattCharacteristic1> GetCharacteristics()
+        {
+            return gattCharacteristics;
         }
 
         /// <summary>

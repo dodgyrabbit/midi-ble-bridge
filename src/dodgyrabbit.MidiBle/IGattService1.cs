@@ -4,7 +4,7 @@ namespace dodgyrabbit.MidiBle
 {
 
     [DBusInterface("org.bluez.GattService1")]
-    public interface IGattService1
+    public interface IGattService1 : IDBusObject
     {
         /// <summary>
         /// 128-bit service UUID. Read only.
