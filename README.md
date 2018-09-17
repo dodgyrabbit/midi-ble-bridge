@@ -25,9 +25,14 @@ My crude collection of notes on how this is progressing, what I tried, what fail
 ## TODO
 - [x] Communicate with BlueZ via D-Bus
 - [x] Get a basic GATT advertisement working
-- [ ] Advertise remaining GATT service properties
-- [ ] Create a BLE service
-- [ ] Send basic MIDI command via BLE service
+- [x] Advertise remaining GATT service properties
+- [x] Create a BLE service
+- [ ] Register MIDI BLE service the mimics Yamaha device
+- [ ] Send a basic MIDI message (keep alive?)
+- [ ] Figure out timing/resolution
+- [ ] How to break "package" multiple midi messages as per the spec
 - [ ] Figure out how to read MIDI messages from USB port
+- [ ] Map incoming midi to outgoing midi
+- [ ] Filter out stuff you don't want to see
       https://github.com/atsushieno/managed-midi
       https://dev.to/atsushieno/managed-midi-the-truly-cross-platform-net-midi-api-56hk

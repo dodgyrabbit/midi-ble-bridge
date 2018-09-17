@@ -40,11 +40,6 @@ namespace dodgyrabbit.MidiBle
                     var advertisingManager = connection.CreateProxy<ILEAdvertisingManager1>(serviceName, hci0Path);
                     await advertisingManager.RegisterAdvertisementAsync(advertisement, new Dictionary<string, object>());
                     
-                    // TODO:
-                    // 1. Export a D-BUS Object Manager at root that is responsible for it's objects
-                    // 2. Register the service using the "org.bluez.GattService1" Interface
-
-
                     Application application = new Application(@"/org/bluez/example");
                     GattService1 service = new GattService1(application.ObjectPath, 0, "0000180d-0000-1000-8000-00805f9b34fb", true);
                     service.AddCharacteristic(new GattCharacteristic1(service.ObjectPath, 0, "00002a37-0000-1000-8000-00805f9b34fb", new string[] {"notify"}));
@@ -54,10 +49,7 @@ namespace dodgyrabbit.MidiBle
 
                     var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/org/bluez/hci0"));
 
-
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
-                    //gattManager.RegisterApplicationAsync()
-
                     await Task.Delay(10000);
                 }
             }).Wait();
