@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using bluez.DBus;
@@ -8,22 +9,9 @@ using Tmds.DBus;
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
 namespace dodgyrabbit.MidiBle
 {
-    // TODO:
-    //  Currently getting a serialization error.
-    //  Do we seperate out the interface from the class? Maybe that is a critical part of how the DBus plumbing works
-
-    // Tried a bunch of things, getting error now:
-    // sudo btmon
-    // Enable verbose logging probably required:
-    // https://stackoverflow.com/questions/37003147/i-want-to-enable-debug-messages-on-bluez
-    // https://wiki.ubuntu.com/DebuggingBluetooth
-    
-    public class dummy : IDisposable
+    public class DummyDisposable : IDisposable
     {
-        public void Dispose()
-        {
-            
-        }
+        public void Dispose() {}
     }
 
     public class Application : IObjectManager
@@ -59,63 +47,51 @@ namespace dodgyrabbit.MidiBle
         public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             var objects = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
-            
-
-            IDictionary<string, IDictionary<string, object>> serviceCharacteristic = new Dictionary<string, IDictionary<string, object>>();
-            IDictionary<string, object> serviceCharacteristics = new Dictionary<string, object>();
-            serviceCharacteristics["Descriptors"] = new ObjectPath[] {};
-            serviceCharacteristics["Flags"] = new string[] {"notify"};
-            // Heart rate measurement
-            serviceCharacteristics["UUID"] = "00002a37-0000-1000-8000-00805f9b34fb";
-            serviceCharacteristics["Service"] = new ObjectPath("/org/bluez/example/service0");
-            serviceCharacteristic["org.bluez.GattCharacteristic1"] = serviceCharacteristics;
-
-            IDictionary<string, object> serviceDetails = new Dictionary<string, object>();
-            serviceDetails["Characteristics"] = new ObjectPath[] {new ObjectPath("/org/bluez/example/service0/char0")};
-            // Heart rate service
-            serviceDetails["UUID"] = "0000180d-0000-1000-8000-00805f9b34fb";
-            serviceDetails["Primary"] = true;
+            // TODO: The GetInterfaceName seems problematic. If we implement more than one, this may fail.
+            // Better solution may be that it is returned by the object itself.
+            // Alternatively we "code" it here. May be OK.
 
             foreach(GattService1 service in services)
             {
                 IDictionary<string, IDictionary<string, object>> serviceDictionary = new Dictionary<string, IDictionary<string, object>>();
-                serviceDictionary[service.GetInterfaceName()] = await service.GetAllAsync();
-
-                objects[new ObjectPath("/org/bluez/example/service0")] = serviceDictionary;
+                serviceDictionary[GetInterfaceName(service)] = await service.GetAllAsync();
+                objects[service.ObjectPath] = serviceDictionary;
 
                 foreach (GattCharacteristic1 characteristic in service.GetCharacteristics())
                 {
                     IDictionary<string, IDictionary<string, object>> characteristics = new Dictionary<string, IDictionary<string, object>>();
-                    // TODO: helper to get object identifier here
-                    characteristics[""] = await characteristic.GetAllAsync();
-
-                // TODO: Need to lookup characteristic path
-                objects["/org/bluez/example/service0/char0"] = characteristics;
-
+                    characteristics[GetInterfaceName(characteristic)] = await characteristic.GetAllAsync();
+                    objects[characteristic.ObjectPath] = characteristics;
                 }
             }
-
-            // objects[gattService.ObjectPath] = new Dictionary<string, IDictionary<string, object>>()
-            //     {
-            //         {gattService.GetInterfaceName(), await gattService.GetAllAsync()}
-            //     };
-            //gattService.GetAllAsync
-
-            // objects[new ObjectPath("/org/bluez/example/service0/char0")] = serviceCharacteristic;
-            // objects[new ObjectPath("/org/bluez/example/service0")] = service;
             return objects as IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>;
+        }
+
+        /// <summary>
+        /// Inspects the current type and returns the DBusInterface.
+        /// </summary>
+        /// <returns>The DBusInterface Name as decorated by the DBusInterfaceAttribute.</returns>
+        private string GetInterfaceName(object o)
+        {
+            Attribute attribute = o.GetType().GetCustomAttribute(typeof(DBusInterfaceAttribute), false);
+            DBusInterfaceAttribute dBusInterface = attribute as DBusInterfaceAttribute;
+            if (dBusInterface == null)
+            {
+                throw new InvalidOperationException("This type does not have the DBusInterfaceAttribute");
+            }
+            return dBusInterface.Name;
         }
 
         public Task<IDisposable>  WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
         {
             Console.WriteLine("WatchInterfacesAdded called");
-            return Task.FromResult(new dummy() as IDisposable);
+            return Task.FromResult(new DummyDisposable() as IDisposable);
         }
 
         public  Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
         {
              Console.WriteLine("WatchInterfacesRemoved called");
-            return Task.FromResult(new dummy() as IDisposable);
+            return Task.FromResult(new DummyDisposable() as IDisposable);
         }
     }
 }

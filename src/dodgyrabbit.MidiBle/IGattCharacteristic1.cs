@@ -5,6 +5,7 @@ using Tmds.DBus;
 namespace dodgyrabbit.MidiBle
 {
 
+    [DBusInterface("org.bluez.GattCharacteristic1")]
     public interface IGattCharacteristic1 : IDBusObject
     {
         /// <summary>

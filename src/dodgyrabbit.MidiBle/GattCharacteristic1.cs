@@ -7,6 +7,7 @@ namespace dodgyrabbit.MidiBle
 {
 
     // TODO: Should explicity implement IPropertyObject
+    [DBusInterface("org.bluez.GattCharacteristic1")]
     public class GattCharacteristic1 : IGattCharacteristic1
     {
         // TODO: GattCharacteristics should support GattDescriptors
@@ -20,7 +21,7 @@ namespace dodgyrabbit.MidiBle
             this.index = index;
             this.UUID = UUID;
             this.Flags = flags;
-            this.objectPath = new ObjectPath(parentPath.ToString() + "/characteristic/" + index);
+            this.objectPath = new ObjectPath(parentPath.ToString() + "/characteristic" + index);
         }
 
         /// <inheritdoc />

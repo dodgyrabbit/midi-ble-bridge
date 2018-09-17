@@ -2,7 +2,6 @@ using Tmds.DBus;
 
 namespace dodgyrabbit.MidiBle
 {
-
     [DBusInterface("org.bluez.GattService1")]
     public interface IGattService1 : IDBusObject
     {

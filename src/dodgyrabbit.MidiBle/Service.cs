@@ -11,11 +11,12 @@ namespace dodgyrabbit.MidiBle
     [DBusInterface("org.bluez.GattService1")]
     public class GattService1 : IDBusObject, IGattService1
     {
+        ObjectPath applicationPath;
         ObjectPath objectPath;
         List<GattCharacteristic1> gattCharacteristics = new List<GattCharacteristic1>();
-        public GattService1(ObjectPath objectPath, string UUID, Boolean primary)
+        public GattService1(ObjectPath parentPath,int index, string UUID, Boolean primary)
         {
-            this.objectPath = objectPath;
+            this.objectPath = new ObjectPath(parentPath.ToString() + "/service" + index);
             this.UUID = UUID;
             this.Primary = primary;
         }
@@ -42,21 +43,6 @@ namespace dodgyrabbit.MidiBle
 
         public ObjectPath ObjectPath => objectPath;
 
-        /// <summary>
-        /// Inspects the current type and returns the DBusInterface.
-        /// </summary>
-        /// <returns>The DBusInterface Name as decorated by the DBusInterfaceAttribute.</returns>
-        public string GetInterfaceName()
-        {
-            Attribute attribute = this.GetType().GetCustomAttribute(typeof(DBusInterfaceAttribute));
-            DBusInterfaceAttribute dBusInterface = attribute as DBusInterfaceAttribute;
-            if (dBusInterface == null)
-            {
-                throw new InvalidOperationException("This type does not have the DBusInterfaceAttribute");
-            }
-            return dBusInterface.Name;
-        }
-
         public Task<IDictionary<string, object>> GetAllAsync()
         {
             return Task.FromResult<IDictionary<string, object>>(
@@ -67,5 +53,4 @@ namespace dodgyrabbit.MidiBle
                 });
         }
     }
-
 }

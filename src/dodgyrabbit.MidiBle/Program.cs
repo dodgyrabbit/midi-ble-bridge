@@ -46,10 +46,8 @@ namespace dodgyrabbit.MidiBle
 
 
                     Application application = new Application(@"/org/bluez/example");
-
-                    // TODO: this can be improved. The base path should really be in the application object
-                    // above. The service just provide it's relative path?
-                    GattService1 service = new GattService1("/org/bluez/example/service0", "0000180d-0000-1000-8000-00805f9b34fb", true);
+                    GattService1 service = new GattService1(application.ObjectPath, 0, "0000180d-0000-1000-8000-00805f9b34fb", true);
+                    service.AddCharacteristic(new GattCharacteristic1(service.ObjectPath, 0, "00002a37-0000-1000-8000-00805f9b34fb", new string[] {"notify"}));
                     application.AddService(service);
 
                     await connection.RegisterObjectAsync(application);
