@@ -51,15 +51,11 @@ namespace dodgyrabbit.MidiBle
 
                     var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/org/bluez/hci0"));
 
-
                     await connection.RegisterObjectAsync(gattCharacteristic1);
 
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 
-                    while (Console.In.Peek() == -1)
-                    {
-                        await Task.Delay(500);
-                    }
+                    await Task.Delay(60000);
                 }
             }).Wait();
         }

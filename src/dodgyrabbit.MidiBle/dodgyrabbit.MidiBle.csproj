@@ -8,5 +8,8 @@
       <PackageReference Include="Tmds.DBus" Version="0.5.0" />
       <DotNetCliToolReference Include="Tmds.DBus.Tool" Version="0.5.0" />
     </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj" />
+  </ItemGroup>
 
 </Project>
