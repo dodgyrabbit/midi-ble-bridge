@@ -32,7 +32,7 @@ namespace dodgyrabbit.MidiBle
         Task StartNotifyAsync();
 
         /// <summary>
-        /// This method will cancel any previous StartNotify transaction. Note that notifications from a characteristic are shared between sessions thus  calling StopNotify will release a single session.
+        /// This method will cancel any previous StartNotify transaction. Note that notifications from a characteristic are shared between sessions thus calling StopNotify will release a single session.
         /// </summary>
         Task StopNotifyAsync();
 

@@ -77,13 +77,13 @@ namespace dodgyrabbit.MidiBle
         /// <inheritdoc />
         public Task StartNotifyAsync()
         {
-            throw new System.NotImplementedException();
+            return Task.Run(() => Console.WriteLine("Received incoming notification"));
         }
 
         /// <inheritdoc />
         public Task StopNotifyAsync()
         {
-            throw new System.NotImplementedException();
+            return Task.Run(() => Console.WriteLine("Connection closed"));
         }
 
         /// <inheritdoc />

@@ -45,6 +45,7 @@ namespace dodgyrabbit.MidiBle
 
         public Task<IDictionary<string, object>> GetAllAsync()
         {
+            Console.WriteLine("GetAllAsync called");
             return Task.FromResult<IDictionary<string, object>>(
                 new Dictionary<string, object>()
                 {

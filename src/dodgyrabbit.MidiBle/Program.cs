@@ -41,16 +41,25 @@ namespace dodgyrabbit.MidiBle
                     await advertisingManager.RegisterAdvertisementAsync(advertisement, new Dictionary<string, object>());
                     
                     Application application = new Application(@"/org/bluez/example");
-                    GattService1 service = new GattService1(application.ObjectPath, 0, "0000180d-0000-1000-8000-00805f9b34fb", true);
-                    service.AddCharacteristic(new GattCharacteristic1(service.ObjectPath, 0, "00002a37-0000-1000-8000-00805f9b34fb", new string[] {"notify"}));
+                    GattService1 service = new GattService1(application.ObjectPath, 0, "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", true);
+
+                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response"});
+                    service.AddCharacteristic(gattCharacteristic1);
                     application.AddService(service);
 
                     await connection.RegisterObjectAsync(application);
 
                     var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/org/bluez/hci0"));
 
+
+                    await connection.RegisterObjectAsync(gattCharacteristic1);
+
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
-                    await Task.Delay(10000);
+
+                    while (Console.In.Peek() == -1)
+                    {
+                        await Task.Delay(500);
+                    }
                 }
             }).Wait();
         }
