@@ -55,7 +55,8 @@ namespace dodgyrabbit.MidiBle
 
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 
-                    await Task.Delay(60000);
+                    Console.WriteLine("Press <ctrl>+c to exit...");
+                    await Task.Delay(Int32.MaxValue);
                 }
             }).Wait();
         }
