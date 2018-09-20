@@ -1,6 +1,4 @@
 [submodule "Tmds.DBus"]
 	path = Tmds.DBus
-	url = https://github.com/tmds/Tmds.DBus.git
-[submodule "Submod"]
 	url = https://github.com/dodgyrabbit/Tmds.DBus
 	branch = master
