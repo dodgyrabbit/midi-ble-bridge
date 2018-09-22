@@ -43,7 +43,7 @@ namespace dodgyrabbit.MidiBle
                     Application application = new Application(@"/org/bluez/example");
                     GattService1 service = new GattService1(application.ObjectPath, 0, "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", true);
 
-                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response"});
+                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response", "secure-read", "secure-write"});
                     service.AddCharacteristic(gattCharacteristic1);
                     application.AddService(service);
 

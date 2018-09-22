@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Tmds.DBus;
 
@@ -89,15 +90,24 @@ namespace dodgyrabbit.MidiBle
         {
             Task.Run(async () =>
             {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var buffer = new byte[3];
                 while (true)
                 {
                     if (isRunning)
                     {
-                        Value = new byte[] {0x80, 0x80, 0xFE};
+
+                        long millis = stopwatch.ElapsedMilliseconds;
+
+                        buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
+                        buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
+                        buffer[2] = 0xFE;
+                        Value = buffer;
                     }
 
                     // don't run again for at least 200 milliseconds
-                    await Task.Delay(1000);
+                    await Task.Delay(150);
                 }
             });
         }
@@ -110,7 +120,7 @@ namespace dodgyrabbit.MidiBle
             isRunning = true;
             return Task.Run(() =>  {
                 // Respond with empty payload on initial request
-                Value = new byte[] {};
+                //Value = new byte[] {};
                 Console.WriteLine("Received incoming notification");
             });
         }
