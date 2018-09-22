@@ -12,8 +12,10 @@ namespace dodgyrabbit.MidiBle
         ObjectPath parentPath;
         ObjectPath objectPath;
         int index;
-
         byte[] value;
+
+        Stopwatch stopwatch = new Stopwatch();
+        object playLock = new object();
 
         public GattCharacteristic1 (ObjectPath parentPath, int index, string UUID, string[] flags)
         {
@@ -22,6 +24,7 @@ namespace dodgyrabbit.MidiBle
             this.UUID = UUID;
             this.Flags = flags;
             this.objectPath = new ObjectPath(parentPath.ToString() + "/characteristic" + index);
+            stopwatch.Start();
         }
 
         /// <inheritdoc />
@@ -90,8 +93,6 @@ namespace dodgyrabbit.MidiBle
         {
             Task.Run(async () =>
             {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
                 var buffer = new byte[3];
                 while (true)
                 {
@@ -103,13 +104,33 @@ namespace dodgyrabbit.MidiBle
                         buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
                         buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
                         buffer[2] = 0xFE;
-                        Value = buffer;
+
+                        lock (playLock)
+                        {
+                            Value = buffer;
+                        }
                     }
 
                     // don't run again for at least 200 milliseconds
                     await Task.Delay(150);
                 }
             });
+        }
+
+        public void PlayNote(byte[] value)
+        {
+            var buffer = new byte[5];
+            long millis = stopwatch.ElapsedMilliseconds;
+
+            buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
+            buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
+            buffer[2] = value[0];
+            buffer[3] = value[1];
+            buffer[4] = value[2];
+            lock (playLock)
+            {
+                Value = buffer;
+            }
         }
 
         volatile bool isRunning;

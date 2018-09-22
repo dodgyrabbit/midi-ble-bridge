@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using bluez.DBus;
+using Commons.Music.Midi;
 using Tmds.DBus;
 
 namespace dodgyrabbit.MidiBle
@@ -11,6 +13,10 @@ namespace dodgyrabbit.MidiBle
         static void Main(string[] args)
         {
             Console.WriteLine("MIDI to BLE Bridge");
+
+            IMidiAccess access = MidiAccessManager.Default;
+            var input = access.OpenInputAsync (access.Inputs.Last().Id).Result;
+
             Task.Run(async () =>
             {
                 Console.WriteLine("Connecting to System D-Bus...");
@@ -43,7 +49,17 @@ namespace dodgyrabbit.MidiBle
                     Application application = new Application(@"/org/bluez/example");
                     GattService1 service = new GattService1(application.ObjectPath, 0, "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", true);
 
-                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response", "secure-read", "secure-write"});
+                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response"});
+
+                    input.MessageReceived += (obj, e) =>
+                    {
+                        // Note off message
+                        if (e.Data[0] != 128)
+                        {
+                            gattCharacteristic1.PlayNote(e.Data);
+                        }
+                        //Console.WriteLine ($"{e.Timestamp} {e.Start} {e.Length} {e.Data [0].ToString ("X")}");
+                    };
                     service.AddCharacteristic(gattCharacteristic1);
                     application.AddService(service);
 
@@ -54,12 +70,16 @@ namespace dodgyrabbit.MidiBle
                     await connection.RegisterObjectAsync(gattCharacteristic1);
                     gattCharacteristic1.StartMidiHeartbeat();
 
+                    
+
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 
                     Console.WriteLine("Press <ctrl>+c to exit...");
                     await Task.Delay(Int32.MaxValue);
                 }
             }).Wait();
+
+            input.CloseAsync();
         }
     }
 }
