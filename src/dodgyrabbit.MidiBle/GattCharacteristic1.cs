@@ -5,15 +5,14 @@ using Tmds.DBus;
 
 namespace dodgyrabbit.MidiBle
 {
-
-    // TODO: Should explicity implement IPropertyObject
-    [DBusInterface("org.bluez.GattCharacteristic1")]
     public class GattCharacteristic1 : IGattCharacteristic1
     {
         // TODO: GattCharacteristics should support GattDescriptors
         ObjectPath parentPath;
         ObjectPath objectPath;
         int index;
+
+        byte[] value;
 
         public GattCharacteristic1 (ObjectPath parentPath, int index, string UUID, string[] flags)
         {
@@ -34,7 +33,18 @@ namespace dodgyrabbit.MidiBle
             }
         }
         /// <inheritdoc />
-        public byte[] Value {get; private set;}
+        public byte[] Value 
+        {   
+            get 
+            {
+                return value;
+            }
+            private set
+            {
+                this.value = value;
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(Value), value));
+            }
+        }
 
         /// <inheritdoc />
         public bool WriteAcquired {get; private set;}
@@ -65,31 +75,64 @@ namespace dodgyrabbit.MidiBle
         /// <inheritdoc />
         public Task ConfirmAsync()
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
         public Task<byte[]> ReadValueAsync(IDictionary<string, object> options)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult <byte[]>(new byte[0]);
         }
+
+        // Quick HACK to get a loop going. Do not do this at home.
+        public void StartMidiHeartbeat()
+        {
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (isRunning)
+                    {
+                        Value = new byte[] {0x80, 0x80, 0xFE};
+                    }
+
+                    // don't run again for at least 200 milliseconds
+                    await Task.Delay(1000);
+                }
+            });
+        }
+
+        volatile bool isRunning;
 
         /// <inheritdoc />
         public Task StartNotifyAsync()
         {
-            return Task.Run(() => Console.WriteLine("Received incoming notification"));
+            isRunning = true;
+            return Task.Run(() =>  {
+                // Respond with empty payload on initial request
+                Value = new byte[] {};
+                Console.WriteLine("Received incoming notification");
+            });
         }
 
         /// <inheritdoc />
         public Task StopNotifyAsync()
         {
+            isRunning = false;
             return Task.Run(() => Console.WriteLine("Connection closed"));
         }
 
         /// <inheritdoc />
         public Task<byte[]> WriteValueAsync(byte[] value, IDictionary<string, object> options)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult<byte[]>(new byte[0]);
+        }
+
+        public event Action<PropertyChanges> OnPropertiesChanged;
+
+        public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)
+        {
+            return SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
         }
     }
 }

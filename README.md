@@ -27,8 +27,9 @@ My crude collection of notes on how this is progressing, what I tried, what fail
 - [x] Get a basic GATT advertisement working
 - [x] Advertise remaining GATT service properties
 - [x] Create a BLE service
-- [ ] Register MIDI BLE service the mimics Yamaha device
+- [x] Register MIDI BLE service the mimics Yamaha device
 - [ ] Send a basic MIDI message (keep alive?)
+- [ ] Enable encryption
 - [ ] Figure out timing/resolution
 - [ ] How to break "package" multiple midi messages as per the spec
 - [ ] Figure out how to read MIDI messages from USB port

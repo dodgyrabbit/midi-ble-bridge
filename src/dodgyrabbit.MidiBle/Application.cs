@@ -60,7 +60,7 @@ namespace dodgyrabbit.MidiBle
                 foreach (GattCharacteristic1 characteristic in service.GetCharacteristics())
                 {
                     IDictionary<string, IDictionary<string, object>> characteristics = new Dictionary<string, IDictionary<string, object>>();
-                    characteristics[GetInterfaceName(characteristic)] = await characteristic.GetAllAsync();
+                    characteristics["org.bluez.GattCharacteristic1"] = await characteristic.GetAllAsync();
                     objects[characteristic.ObjectPath] = characteristics;
                 }
             }

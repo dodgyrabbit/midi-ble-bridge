@@ -52,6 +52,7 @@ namespace dodgyrabbit.MidiBle
                     var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/org/bluez/hci0"));
 
                     await connection.RegisterObjectAsync(gattCharacteristic1);
+                    gattCharacteristic1.StartMidiHeartbeat();
 
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 

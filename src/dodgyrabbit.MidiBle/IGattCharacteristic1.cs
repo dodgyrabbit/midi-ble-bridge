@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tmds.DBus;
@@ -96,5 +97,10 @@ namespace dodgyrabbit.MidiBle
         /// "authorize"
         /// </summary>
 		string[] Flags {get;}
+
+        // TODO: Figure out some of the magic behind this. Basically once I've added this
+        // method in, you can raise an event hand have it signalled. However, it can't
+        // simply be in the class, it must be in an Interface.
+        Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
     }
 }
