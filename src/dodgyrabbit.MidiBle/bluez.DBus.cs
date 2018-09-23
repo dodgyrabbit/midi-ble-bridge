@@ -6,7 +6,7 @@ using dodgyrabbit.MidiBle;
 using Tmds.DBus;
 
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
-namespace bluez.DBus
+namespace dodgyrabbit.MidiBle
 {
 
     [DBusInterface("org.bluez.LEAdvertisement1")]

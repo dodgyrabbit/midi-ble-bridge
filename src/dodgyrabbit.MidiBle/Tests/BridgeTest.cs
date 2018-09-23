@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Xunit;
 
 namespace dodgyrabbit.MidiBle.Tests
@@ -60,6 +62,29 @@ namespace dodgyrabbit.MidiBle.Tests
             Assert.Equal(noteOn1, messages[0]);
             // This is the important bit - the second message should also have header byte
             Assert.Equal(new byte[] {0x90, 0x25, 0x0}, messages[1]);
+        }
+
+        /// <summary>
+        /// Tests that in a given time interval we receive active sense messages.
+        /// This is not a great test because it depends on the execution and timing of threads.
+        /// Ideally something where the test can control the loop
+        /// </summary>
+        [Fact]
+        public void ActiveSense()
+        {
+            int activeSenseCount = 0;
+            Bridge bridge = new Bridge(data =>
+            {
+                Assert.Equal(data.Length, 3);
+                Assert.Equal(data[2], 0xFE);
+                activeSenseCount++;
+            }, TimeSpan.FromMilliseconds(100));
+
+            bridge.Start();
+            Thread.Sleep(250);
+            bridge.Stop();
+
+            Assert.Equal(3, activeSenseCount);
         }
     }
 }
