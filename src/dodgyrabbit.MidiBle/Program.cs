@@ -16,18 +16,6 @@ namespace dodgyrabbit.MidiBle
             Console.WriteLine("MIDI to BLE Bridge");
 
             var access = MidiAccessManager.Default;
-
-            string id = "";
-            foreach (IMidiPortDetails port in access.Inputs)
-            {
-                Console.WriteLine($"{port.Name}");
-                if (port.Name.Contains("mio", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    id = port.Id;
-                    Console.WriteLine(id);
-                }
-            }
-
             var midiPort = access.Inputs.FirstOrDefault(inp => inp.Name.Contains("mio", StringComparison.OrdinalIgnoreCase));
             if (midiPort == null)
             {
@@ -51,11 +39,9 @@ namespace dodgyrabbit.MidiBle
 
             Task.Run(async () =>
             {
-                Console.WriteLine("Connecting to System D-Bus...");
                 using (var connection = new Connection(Address.System))
                 {
                     await connection.ConnectAsync();
-                    Console.WriteLine("Connected");
 
                     var hci0Path = new ObjectPath("/org/bluez/hci0");
                     var serviceName = "org.bluez";
@@ -106,7 +92,7 @@ namespace dodgyrabbit.MidiBle
 
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 
-                    Console.WriteLine("Press <ctrl>+c to exit...");
+                    Console.WriteLine("Press <Ctrl>+c to exit...");
                     await Task.Delay(Int32.MaxValue);
                 }
             }).Wait();
