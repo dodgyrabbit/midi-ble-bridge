@@ -13,35 +13,37 @@ namespace dodgyrabbit.MidiBle
     {
         static async Task Main(string[] args)
         {
-            //Console.WriteLine("MIDI to BLE Bridge");
+            Console.WriteLine("MIDI to BLE Bridge");
 
             var access = MidiAccessManager.Default;
 
             string id = "";
-            // foreach (IMidiPortDetails port in access.Inputs)
-            // {
-            //     Console.WriteLine($"{port.Name}");
-            //     if (port.Name.Contains("mio", StringComparison.InvariantCultureIgnoreCase))
-            //     {
-            //         id = port.Id;
-            //         Console.WriteLine(id);
-            //     }
-            // }
+            foreach (IMidiPortDetails port in access.Inputs)
+            {
+                Console.WriteLine($"{port.Name}");
+                if (port.Name.Contains("mio", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    id = port.Id;
+                    Console.WriteLine(id);
+                }
+            }
 
-            //var input = access.OpenInputAsync (access.Inputs.Last().Id).Result;
-            //var midiId = access.Inputs.First(inp => inp.Name.Contains("mio", StringComparison.OrdinalIgnoreCase)).Id;
-            //var input = access.OpenInputAsync (id).Result;
+            var midiPort = access.Inputs.FirstOrDefault(inp => inp.Name.Contains("mio", StringComparison.OrdinalIgnoreCase));
+            if (midiPort == null)
+            {
+                midiPort = access.Inputs.FirstOrDefault(inp => inp.Name.Contains("vmpk", StringComparison.OrdinalIgnoreCase));
+            }
 
-            var input = await access.OpenInputAsync("20_0");
-
-            input.MessageReceived += (obj, e) => {
-			//	Console.WriteLine ($"{e.Timestamp} {e.Start} {e.Length} {e.Data [0].ToString ("X")}");
-			};
-
-            Task.Delay(4000);
-
-            byte lastStatusByte = 0;
-            //Console.ReadLine();
+            IMidiInput input = null;
+            if (midiPort != null)
+            {
+                Console.WriteLine($"Found {midiPort.Name}. Opening...");
+                input = await access.OpenInputAsync(midiPort.Id);
+            }
+            else
+            {
+                Console.WriteLine($"No suitable MIDI port found.");
+            }
 
             Task.Run(async () =>
             {
@@ -49,7 +51,7 @@ namespace dodgyrabbit.MidiBle
                 using (var connection = new Connection(Address.System))
                 {
                     await connection.ConnectAsync();
-                    Console.WriteLine("Connected"); 
+                    Console.WriteLine("Connected");
 
                     var hci0Path = new ObjectPath("/org/bluez/hci0");
                     var serviceName = "org.bluez";
@@ -59,8 +61,8 @@ namespace dodgyrabbit.MidiBle
                     Console.WriteLine("Setting power to true on device 1");
                     await hci0Adapter.SetPoweredAsync(true);
 
-                    var advertisement = new LEAdvertisement(new LEAdvertisementProperties {Type = "peripheral", LocalName="MIDI-BRIDGE"} );
-                    advertisement.LEAdvertisementProperties.ServiceUUIDs = new string[] {"03B80E5A-EDE8-4B33-A751-6CE34EC4C700"};
+                    var advertisement = new LEAdvertisement(new LEAdvertisementProperties { Type = "peripheral", LocalName = "MIDI-BRIDGE" });
+                    advertisement.LEAdvertisementProperties.ServiceUUIDs = new string[] { "03B80E5A-EDE8-4B33-A751-6CE34EC4C700" };
 
                     // Generic computer icon
                     advertisement.LEAdvertisementProperties.Appearance = 0x0080;
@@ -71,83 +73,32 @@ namespace dodgyrabbit.MidiBle
 
                     var advertisingManager = connection.CreateProxy<ILEAdvertisingManager1>(serviceName, hci0Path);
                     await advertisingManager.RegisterAdvertisementAsync(advertisement, new Dictionary<string, object>());
-                    
+
                     Application application = new Application(@"/org/bluez/example");
                     GattService1 service = new GattService1(application.ObjectPath, 0, "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", true);
 
-                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response"});
-                    input.MessageReceived += (obj, e) =>
+                    GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] { "notify", "read", "write-without-response" });
+
+                    // TODO: Remove PlayNote out of gattCharacteristic. Bridge should handle locking.
+                    Bridge midiBleBridge = new Bridge(data => gattCharacteristic1.PlayNote(data));
+
+                    if (input != null)
                     {
-                        if (e.Length == 1 && e.Data[0] == 0xFE)
+                        input.MessageReceived += (obj, e) =>
                         {
-                            return;
-                        }
-						bool hasStatusByte = false;
-
- 						List<byte> bytes = new List<byte>();
-                        for (int i=0; i < e.Length; i++)
-                        {
-                            bool isStatusByte = ((e.Data[i] & (byte)0b1000_0000) > 0);
-
-                            if (!hasStatusByte && !isStatusByte)
-                            {
-                                // Continuation from previous message. Repeat status byte.
-                                if (lastStatusByte != 128)
-                                {
-                                    bytes.Add(lastStatusByte);
-                                    bytes.Add(e.Data[i]);
-                                }
-                                hasStatusByte = true;
-                                continue;
-                            } 
-                            if (!hasStatusByte && isStatusByte)
-                            {
-                                // New message, starting with status
-                                
-                                if (e.Data[i] != 128)
-                                {
-                                    // Skip the note-off messages
-                                    bytes.Add(e.Data[i]);
-                                }
-
-                                hasStatusByte = true;
-                                lastStatusByte = e.Data[i];
-                                continue;
-                            }
-
-                            if (isStatusByte)
-                            {
-                                // Multiple status bytes in a row
-                                if (e.Data[i] != 128)
-                                {
-                                    bytes.Add(e.Data[i]);
-                                }
-                                lastStatusByte = e.Data[i];
-                                continue;
-                            }
-
-                            // Must be a data byte then, add it
-                            if (lastStatusByte != 128)
-                            {
-                                bytes.Add(e.Data[i]);
-                            }
-                    }   
-                        if (bytes.Count > 0)
-                        {
-                            gattCharacteristic1.PlayNote(bytes.ToArray());
-                        }
-                    };
+                            midiBleBridge.ReceiveMidiMessage(e.Length, e.Data);
+                        };
+                    }
                     service.AddCharacteristic(gattCharacteristic1);
                     application.AddService(service);
 
                     await connection.RegisterObjectAsync(application);
 
                     var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/org/bluez/hci0"));
-
                     await connection.RegisterObjectAsync(gattCharacteristic1);
-                    gattCharacteristic1.StartMidiHeartbeat();
 
-                    
+                    // TODO: This must be refactored out of GattCharacteristic
+                    gattCharacteristic1.StartMidiHeartbeat();
 
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 
