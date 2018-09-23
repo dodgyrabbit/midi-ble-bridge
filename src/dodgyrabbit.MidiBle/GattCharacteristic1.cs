@@ -103,6 +103,7 @@ namespace dodgyrabbit.MidiBle
 
                         buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
                         buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
+                        // Active sending message
                         buffer[2] = 0xFE;
 
                         lock (playLock)
@@ -111,7 +112,7 @@ namespace dodgyrabbit.MidiBle
                         }
                     }
 
-                    // don't run again for at least 200 milliseconds
+                    // Yamaha has a 200ms delay between messages
                     await Task.Delay(150);
                 }
             });
@@ -119,14 +120,17 @@ namespace dodgyrabbit.MidiBle
 
         public void PlayNote(byte[] value)
         {
-            var buffer = new byte[5];
+            var buffer = new byte[2 + value.Length];
             long millis = stopwatch.ElapsedMilliseconds;
 
             buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
             buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
-            buffer[2] = value[0];
-            buffer[3] = value[1];
-            buffer[4] = value[2];
+
+            // TODO: block copy
+            for (int i=0; i < value.Length; i++)
+            {
+                buffer[i+2] = value[i];
+            }
             lock (playLock)
             {
                 Value = buffer;

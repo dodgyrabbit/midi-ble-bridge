@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using bluez.DBus;
 using Commons.Music.Midi;
@@ -10,12 +11,37 @@ namespace dodgyrabbit.MidiBle
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("MIDI to BLE Bridge");
+            //Console.WriteLine("MIDI to BLE Bridge");
 
-            IMidiAccess access = MidiAccessManager.Default;
-            var input = access.OpenInputAsync (access.Inputs.Last().Id).Result;
+            var access = MidiAccessManager.Default;
+
+            string id = "";
+            // foreach (IMidiPortDetails port in access.Inputs)
+            // {
+            //     Console.WriteLine($"{port.Name}");
+            //     if (port.Name.Contains("mio", StringComparison.InvariantCultureIgnoreCase))
+            //     {
+            //         id = port.Id;
+            //         Console.WriteLine(id);
+            //     }
+            // }
+
+            //var input = access.OpenInputAsync (access.Inputs.Last().Id).Result;
+            //var midiId = access.Inputs.First(inp => inp.Name.Contains("mio", StringComparison.OrdinalIgnoreCase)).Id;
+            //var input = access.OpenInputAsync (id).Result;
+
+            var input = await access.OpenInputAsync("20_0");
+
+            input.MessageReceived += (obj, e) => {
+			//	Console.WriteLine ($"{e.Timestamp} {e.Start} {e.Length} {e.Data [0].ToString ("X")}");
+			};
+
+            Task.Delay(4000);
+
+            byte lastStatusByte = 0;
+            //Console.ReadLine();
 
             Task.Run(async () =>
             {
@@ -50,15 +76,66 @@ namespace dodgyrabbit.MidiBle
                     GattService1 service = new GattService1(application.ObjectPath, 0, "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", true);
 
                     GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] {"notify", "read", "write-without-response"});
-
                     input.MessageReceived += (obj, e) =>
                     {
-                        // Note off message
-                        if (e.Data[0] != 128)
+                        if (e.Length == 1 && e.Data[0] == 0xFE)
                         {
-                            gattCharacteristic1.PlayNote(e.Data);
+                            return;
                         }
-                        //Console.WriteLine ($"{e.Timestamp} {e.Start} {e.Length} {e.Data [0].ToString ("X")}");
+						bool hasStatusByte = false;
+
+ 						List<byte> bytes = new List<byte>();
+                        for (int i=0; i < e.Length; i++)
+                        {
+                            bool isStatusByte = ((e.Data[i] & (byte)0b1000_0000) > 0);
+
+                            if (!hasStatusByte && !isStatusByte)
+                            {
+                                // Continuation from previous message. Repeat status byte.
+                                if (lastStatusByte != 128)
+                                {
+                                    bytes.Add(lastStatusByte);
+                                    bytes.Add(e.Data[i]);
+                                }
+                                hasStatusByte = true;
+                                continue;
+                            } 
+                            if (!hasStatusByte && isStatusByte)
+                            {
+                                // New message, starting with status
+                                
+                                if (e.Data[i] != 128)
+                                {
+                                    // Skip the note-off messages
+                                    bytes.Add(e.Data[i]);
+                                }
+
+                                hasStatusByte = true;
+                                lastStatusByte = e.Data[i];
+                                continue;
+                            }
+
+                            if (isStatusByte)
+                            {
+                                // Multiple status bytes in a row
+                                if (e.Data[i] != 128)
+                                {
+                                    bytes.Add(e.Data[i]);
+                                }
+                                lastStatusByte = e.Data[i];
+                                continue;
+                            }
+
+                            // Must be a data byte then, add it
+                            if (lastStatusByte != 128)
+                            {
+                                bytes.Add(e.Data[i]);
+                            }
+                    }   
+                        if (bytes.Count > 0)
+                        {
+                            gattCharacteristic1.PlayNote(bytes.ToArray());
+                        }
                     };
                     service.AddCharacteristic(gattCharacteristic1);
                     application.AddService(service);
@@ -79,7 +156,7 @@ namespace dodgyrabbit.MidiBle
                 }
             }).Wait();
 
-            input.CloseAsync();
+            await input.CloseAsync();
         }
     }
 }

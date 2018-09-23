@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
       <PackageReference Include="managed-midi" Version="1.3.2" />
@@ -12,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj" />
   </ItemGroup>
+  
 
 </Project>
