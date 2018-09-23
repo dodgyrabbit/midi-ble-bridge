@@ -39,6 +39,10 @@ namespace dodgyrabbit.MidiBle
             {
                 Console.WriteLine($"Found {midiPort.Name}. Opening...");
                 input = await access.OpenInputAsync(midiPort.Id);
+                // There seems to be a pretty bad race condition inside the library.
+                // If your MIDI device is streaming data but there is no MessageReceived delegate, it will
+                // throw a NRE. So register this dummy here for now.
+                input.MessageReceived += (obj, e) => {};
             }
             else
             {
