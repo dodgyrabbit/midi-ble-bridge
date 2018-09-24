@@ -1,29 +1,27 @@
-﻿using Tmds.DBus;
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections;
-
-namespace dodgyrabbit.MidiBle
+﻿namespace dodgyrabbit.MidiBle
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Tmds.DBus;
+
     [DBusInterface("org.bluez.GattService1")]
     public class GattService1 : IDBusObject, IGattService1
     {
         ObjectPath applicationPath;
         ObjectPath objectPath;
-        List<GattCharacteristic1> gattCharacteristics = new List<GattCharacteristic1>();
-        public GattService1(ObjectPath parentPath,int index, string UUID, Boolean primary)
+        readonly List<GattCharacteristic1> gattCharacteristics = new List<GattCharacteristic1>();
+
+        public GattService1(ObjectPath parentPath, int index, string uuid, bool primary)
         {
-            this.objectPath = new ObjectPath(parentPath.ToString() + "/service" + index);
-            this.UUID = UUID;
+            this.objectPath = new ObjectPath(parentPath + "/service" + index);
+            this.UUID = uuid;
             this.Primary = primary;
         }
 
         public void AddCharacteristic(GattCharacteristic1 characteristic)
         {
-            this.gattCharacteristics.Add(characteristic);
+            gattCharacteristics.Add(characteristic);
         }
 
         public IEnumerable<GattCharacteristic1> GetCharacteristics()

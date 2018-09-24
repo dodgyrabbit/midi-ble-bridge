@@ -25,6 +25,7 @@
             {
                 Console.WriteLine($"Found {midiPort.Name}. Opening...");
                 input = await access.OpenInputAsync(midiPort.Id);
+
                 // There seems to be a pretty bad race condition inside the library.
                 // If your MIDI device is streaming data but there is no MessageReceived delegate, it will
                 // throw a NRE. So register this dummy here for now.
@@ -56,7 +57,7 @@
                     advertisement.LEAdvertisementProperties.Appearance = 0x0080;
 
                     // We need to register the LEAdvertisement object. This basically publishes the object
-                    // so that when we get the DBus callback to read all the properties, we're good to go. 
+                    // so that when we get the DBus callback to read all the properties, we're good to go.
                     await connection.RegisterObjectAsync(advertisement);
 
                     var advertisingManager = connection.CreateProxy<ILEAdvertisingManager1>(serviceName, hci0Path);
@@ -88,7 +89,7 @@
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 
                     Console.WriteLine("Press <Ctrl>+c to exit...");
-                    await Task.Delay(Int32.MaxValue);
+                    await Task.Delay(int.MaxValue);
                 }
             }).Wait();
 

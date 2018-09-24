@@ -4,25 +4,26 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Tmds.DBus;
-    
+
     public class GattCharacteristic1 : IGattCharacteristic1
     {
-        ObjectPath parentPath;
-        ObjectPath objectPath;
+        readonly ObjectPath parentPath;
+        readonly ObjectPath objectPath;
         int index;
         byte[] value;
-        public GattCharacteristic1(ObjectPath parentPath, int index, string UUID, string[] flags)
+
+        public GattCharacteristic1(ObjectPath parentPath, int index, string uuid, string[] flags)
         {
             this.parentPath = parentPath;
             this.index = index;
-            this.UUID = UUID;
+            this.UUID = uuid;
             this.Flags = flags;
-            this.objectPath = new ObjectPath(parentPath.ToString() + "/characteristic" + index);
+            this.objectPath = new ObjectPath(parentPath + "/characteristic" + index);
         }
 
         /// <inheritdoc />
         public string UUID { get; private set; }
-        
+
         public ObjectPath Service
         {
             get
@@ -38,7 +39,7 @@
             {
                 return value;
             }
-            
+
             set
             {
                 Console.WriteLine($"{value[0]},{value[1]},{value[2]}");
@@ -85,9 +86,9 @@
         /// <inheritdoc />
         public Task<byte[]> ReadValueAsync(IDictionary<string, object> options)
         {
-            return Task.FromResult<byte[]>(new byte[0]);
+            return Task.FromResult(new byte[0]);
         }
-        
+
         volatile bool isRunning;
 
         /// <inheritdoc />
@@ -111,7 +112,7 @@
         /// <inheritdoc />
         public Task<byte[]> WriteValueAsync(byte[] value, IDictionary<string, object> options)
         {
-            return Task.FromResult<byte[]>(new byte[0]);
+            return Task.FromResult(new byte[0]);
         }
 
         public event Action<PropertyChanges> OnPropertiesChanged;

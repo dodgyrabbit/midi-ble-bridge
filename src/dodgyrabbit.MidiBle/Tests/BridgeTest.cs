@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Xunit;
-
-namespace dodgyrabbit.MidiBle.Tests
+﻿namespace dodgyrabbit.MidiBle.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using Xunit;
+
     public class BridgeTest
     {
-        byte[] RemoveTimestamp(byte[] message)
-        {
-            if (message.Length < 2)
-            {
-                Assert.True(false, "Message too short for timestamp");
-            }
-            return message.Skip(2).Take(message.Length-2).ToArray();
-        }
-
         [Fact]
         public void NoteOn()
         {
-            byte[] noteOn = new byte[] {0x90, 0x24, 0x0};
+            byte[] noteOn = {0x90, 0x24, 0x0};
             Bridge bridge = new Bridge(data =>
             {
                 Assert.Equal(noteOn, RemoveTimestamp(data));
@@ -32,7 +23,7 @@ namespace dodgyrabbit.MidiBle.Tests
         [Fact]
         public void NoteOff()
         {
-            byte[] noteOff = new byte[] {0x80, 0x24, 0x0};
+            byte[] noteOff = {0x80, 0x24, 0x0};
             Bridge bridge = new Bridge(data =>
             {
                 Assert.True(false, "Expected message to be filtered, yet here we are");
@@ -43,7 +34,7 @@ namespace dodgyrabbit.MidiBle.Tests
         [Fact]
         public void MultipleNoteOnInOneMessage()
         {
-            byte[] noteOn = new byte[] {0x90, 0x24, 0x0, 0x25, 0x0};
+            byte[] noteOn = {0x90, 0x24, 0x0, 0x25, 0x0};
             Bridge bridge = new Bridge(data =>
             {
                 Assert.Equal(noteOn, RemoveTimestamp(data));
@@ -55,21 +46,24 @@ namespace dodgyrabbit.MidiBle.Tests
         public void MultipleNoteOnInTwoMessages()
         {
             // First message includes the Status byte (0x90 - Note on)
-            byte[] noteOn1 = new byte[] {0x90, 0x24, 0x0};
+            byte[] noteOn1 = {0x90, 0x24, 0x0};
+
             // Second message is a continuation, and does not
-            byte[] noteOn2 = new byte[] {0x25, 0x0};
+            byte[] noteOn2 = {0x25, 0x0};
 
             List<byte[]> messages = new List<byte[]>();
             Bridge bridge = new Bridge(data =>
             {
                 messages.Add(data);
             });
-            // Send the two messages seperately
+
+            // Send the two messages separately
             bridge.ReceiveMidiMessage(noteOn1.Length, noteOn1);
             bridge.ReceiveMidiMessage(noteOn2.Length, noteOn2);
 
             // First message includes header byte
             Assert.Equal(noteOn1, RemoveTimestamp(messages[0]));
+
             // This is the important bit - the second message should also have header byte
             Assert.Equal(new byte[] {0x90, 0x25, 0x0}, RemoveTimestamp(messages[1]));
         }
@@ -85,16 +79,24 @@ namespace dodgyrabbit.MidiBle.Tests
             int activeSenseCount = 0;
             Bridge bridge = new Bridge(data =>
             {
-                Assert.Equal(data.Length, 3);
-                Assert.Equal(data[2], 0xFE);
+                Assert.Equal(3, data.Length);
+                Assert.Equal(0xFE, data[2]);
                 activeSenseCount++;
             }, TimeSpan.FromMilliseconds(100));
 
             bridge.StartActiveSense();
             Thread.Sleep(250);
             bridge.StopActiveSense();
-
             Assert.Equal(3, activeSenseCount);
+        }
+
+        byte[] RemoveTimestamp(byte[] message)
+        {
+            if (message.Length < 2)
+            {
+                Assert.True(false, "Message too short for timestamp");
+            }
+            return message.Skip(2).Take(message.Length - 2).ToArray();
         }
     }
 }
