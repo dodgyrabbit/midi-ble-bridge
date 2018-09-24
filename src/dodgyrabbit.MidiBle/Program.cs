@@ -70,7 +70,7 @@ namespace dodgyrabbit.MidiBle
 
                     // TODO: Remove PlayNote out of gattCharacteristic. Bridge should handle locking.
                     Bridge midiBleBridge = new Bridge(data => gattCharacteristic1.Value = data);
-
+                    midiBleBridge.StartActiveSense();
                     if (input != null)
                     {
                         input.MessageReceived += (obj, e) =>
