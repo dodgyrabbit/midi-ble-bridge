@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Commons.Music.Midi;
-using Tmds.DBus;
-
-namespace dodgyrabbit.MidiBle
+﻿namespace dodgyrabbit.MidiBle
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Commons.Music.Midi;
+    using Tmds.DBus;
+
     class Program
     {
         static async Task Main(string[] args)
@@ -33,7 +32,7 @@ namespace dodgyrabbit.MidiBle
             }
             else
             {
-                Console.WriteLine($"No suitable MIDI port found.");
+                Console.WriteLine("No suitable MIDI port found.");
             }
 
             Task.Run(async () =>

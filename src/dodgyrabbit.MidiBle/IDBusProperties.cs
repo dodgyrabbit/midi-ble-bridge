@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Tmds.DBus;
-
-namespace dodgyrabbit.MidiBle
+﻿namespace dodgyrabbit.MidiBle
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Tmds.DBus;
+    
     /// <summary>
     /// This class is probably redundant and here because of a lack of understanding.
     /// It seems like any time you implement a DBusINterface you are expected to have

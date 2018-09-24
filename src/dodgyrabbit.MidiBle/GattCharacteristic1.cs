@@ -22,6 +22,7 @@
 
         /// <inheritdoc />
         public string UUID { get; private set; }
+        
         public ObjectPath Service
         {
             get
@@ -29,7 +30,7 @@
                 return parentPath;
             }
         }
-        
+
         /// <inheritdoc />
         public byte[] Value
         {
@@ -37,6 +38,7 @@
             {
                 return value;
             }
+            
             set
             {
                 Console.WriteLine($"{value[0]},{value[1]},{value[2]}");
@@ -85,6 +87,7 @@
         {
             return Task.FromResult<byte[]>(new byte[0]);
         }
+        
         volatile bool isRunning;
 
         /// <inheritdoc />
@@ -94,8 +97,7 @@
             return Task.Run(() =>
             {
                 // Respond with empty payload on initial request
-                //Value = new byte[] {};
-                Console.WriteLine("Received incoming notification");
+                Console.WriteLine("Start notifications requested");
             });
         }
 

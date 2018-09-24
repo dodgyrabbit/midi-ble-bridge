@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Tmds.DBus;
-
-namespace dodgyrabbit.MidiBle
+﻿namespace dodgyrabbit.MidiBle
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Tmds.DBus;
 
     [DBusInterface("org.bluez.GattCharacteristic1")]
     public interface IGattCharacteristic1 : IDBusObject
@@ -14,8 +13,8 @@ namespace dodgyrabbit.MidiBle
         /// </summary>
         /// <param name="options">
         /// Possible options: "offset": uint16 offset
-		/// "mtu": Exchanged MTU (Server only)
-		/// "device": Object Device (Server only)
+        /// "mtu": Exchanged MTU (Server only)
+        /// "device": Object Device (Server only)
         /// </param>
         /// <returns></returns>
         Task<byte[]> ReadValueAsync(IDictionary<string, object> options);
@@ -56,25 +55,25 @@ namespace dodgyrabbit.MidiBle
         /// The cached value of the characteristic. This property gets updated only after a successful read request and  when a notification or indication is received, upon which a PropertiesChanged signal will be emitted.
         /// </summary>
         byte[] Value{get;}
-		
+
         /// <summary>
         /// True, if this characteristic has been acquired by any client using AcquireWrite.
         /// For client properties is ommited in case 'write-without-response' flag is not set.
         /// For server the presence of this property indicates that AcquireWrite is supported.
         /// </summary>
-		bool WriteAcquired {get;}
+        bool WriteAcquired {get;}
 
         /// <summary>
         /// True, if this characteristic has been acquired by any client using AcquireNotify.
-	    /// For client this properties is ommited in case 'notify' flag is not set.
-	    /// For server the presence of this property indicates that AcquireNotify is supported.
+        /// For client this properties is ommited in case 'notify' flag is not set.
+        /// For server the presence of this property indicates that AcquireNotify is supported.
         /// </summary>
-		bool NotifyAcquired {get;}
+        bool NotifyAcquired {get;}
 
         /// <summary>
-		/// True, if notifications or indications on this characteristic are currently enabled.
+        /// True, if notifications or indications on this characteristic are currently enabled.
         /// </summary>
-		bool Notifying {get;}
+        bool Notifying {get;}
 
         // TODO: this should probably be an areay of enums, or a flags enum?
         /// <summary>
@@ -96,7 +95,7 @@ namespace dodgyrabbit.MidiBle
         /// "secure-write" (Server only)
         /// "authorize"
         /// </summary>
-		string[] Flags {get;}
+        string[] Flags {get;}
 
         // TODO: Figure out some of the magic behind this. Basically once I've added this
         // method in, you can raise an event hand have it signalled. However, it can't
