@@ -8,59 +8,58 @@ namespace dodgyrabbit.MidiBle
 {
     public class GattCharacteristic1 : IGattCharacteristic1
     {
-        // TODO: GattCharacteristics should support GattDescriptors
         ObjectPath parentPath;
         ObjectPath objectPath;
         int index;
         byte[] value;
-
-        Stopwatch stopwatch = new Stopwatch();
-        object playLock = new object();
-
-        public GattCharacteristic1 (ObjectPath parentPath, int index, string UUID, string[] flags)
+        public GattCharacteristic1(ObjectPath parentPath, int index, string UUID, string[] flags)
         {
             this.parentPath = parentPath;
             this.index = index;
             this.UUID = UUID;
             this.Flags = flags;
             this.objectPath = new ObjectPath(parentPath.ToString() + "/characteristic" + index);
-            stopwatch.Start();
         }
 
         /// <inheritdoc />
-        public string UUID {get; private set;}
-        public ObjectPath Service 
+        public string UUID { get; private set; }
+        public ObjectPath Service
         {
             get
             {
                 return parentPath;
             }
         }
+        
         /// <inheritdoc />
-        public byte[] Value 
-        {   
-            get 
+        public byte[] Value
+        {
+            get
             {
                 return value;
             }
-            private set
+            set
             {
+                Console.WriteLine($"{value[0]},{value[1]},{value[2]}");
                 this.value = value;
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(Value), value));
+                if (isRunning)
+                {
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(Value), value));
+                }
             }
         }
 
         /// <inheritdoc />
-        public bool WriteAcquired {get; private set;}
+        public bool WriteAcquired { get; private set; }
 
         /// <inheritdoc />
-        public bool NotifyAcquired {get; private set;}
+        public bool NotifyAcquired { get; private set; }
 
         /// <inheritdoc />
-        public bool Notifying {get; private set;}
+        public bool Notifying { get; private set; }
 
         /// <inheritdoc />
-        public string[] Flags {get; private set;}
+        public string[] Flags { get; private set; }
 
         /// <inheritdoc />
         public ObjectPath ObjectPath => objectPath;
@@ -85,65 +84,16 @@ namespace dodgyrabbit.MidiBle
         /// <inheritdoc />
         public Task<byte[]> ReadValueAsync(IDictionary<string, object> options)
         {
-            return Task.FromResult <byte[]>(new byte[0]);
+            return Task.FromResult<byte[]>(new byte[0]);
         }
-
-        // Quick HACK to get a loop going. Do not do this at home.
-        public void StartMidiHeartbeat()
-        {
-            Task.Run(async () =>
-            {
-                var buffer = new byte[3];
-                while (true)
-                {
-                    if (isRunning)
-                    {
-
-                        long millis = stopwatch.ElapsedMilliseconds;
-
-                        buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
-                        buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
-                        // Active sending message
-                        buffer[2] = 0xFE;
-
-                        lock (playLock)
-                        {
-                            Value = buffer;
-                        }
-                    }
-
-                    // Yamaha has a 200ms delay between messages
-                    await Task.Delay(150);
-                }
-            });
-        }
-
-        public void PlayNote(byte[] value)
-        {
-            var buffer = new byte[2 + value.Length];
-            long millis = stopwatch.ElapsedMilliseconds;
-
-            buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
-            buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
-
-            // TODO: block copy
-            for (int i=0; i < value.Length; i++)
-            {
-                buffer[i+2] = value[i];
-            }
-            lock (playLock)
-            {
-                Value = buffer;
-            }
-        }
-
         volatile bool isRunning;
 
         /// <inheritdoc />
         public Task StartNotifyAsync()
         {
             isRunning = true;
-            return Task.Run(() =>  {
+            return Task.Run(() =>
+            {
                 // Respond with empty payload on initial request
                 //Value = new byte[] {};
                 Console.WriteLine("Received incoming notification");

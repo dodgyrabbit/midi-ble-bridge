@@ -69,7 +69,7 @@ namespace dodgyrabbit.MidiBle
                     GattCharacteristic1 gattCharacteristic1 = new GattCharacteristic1(service.ObjectPath, 0, "7772E5DB-3868-4112-A1A9-F2669D106BF3", new string[] { "notify", "read", "write-without-response" });
 
                     // TODO: Remove PlayNote out of gattCharacteristic. Bridge should handle locking.
-                    Bridge midiBleBridge = new Bridge(data => gattCharacteristic1.PlayNote(data));
+                    Bridge midiBleBridge = new Bridge(data => gattCharacteristic1.Value = data);
 
                     if (input != null)
                     {
@@ -85,9 +85,6 @@ namespace dodgyrabbit.MidiBle
 
                     var gattManager = connection.CreateProxy<IGattManager1>(serviceName, new ObjectPath(@"/org/bluez/hci0"));
                     await connection.RegisterObjectAsync(gattCharacteristic1);
-
-                    // TODO: This must be refactored out of GattCharacteristic
-                    gattCharacteristic1.StartMidiHeartbeat();
 
                     await gattManager.RegisterApplicationAsync(application, new Dictionary<string, object>());
 

@@ -8,7 +8,6 @@ using Tmds.DBus;
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
 namespace dodgyrabbit.MidiBle
 {
-
     [DBusInterface("org.bluez.LEAdvertisement1")]
     interface ILEAdvertisement1 : IDBusObject
     {

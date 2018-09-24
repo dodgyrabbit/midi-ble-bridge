@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Xunit;
 
@@ -7,13 +8,22 @@ namespace dodgyrabbit.MidiBle.Tests
 {
     public class BridgeTest
     {
+        byte[] RemoveTimestamp(byte[] message)
+        {
+            if (message.Length < 2)
+            {
+                Assert.True(false, "Message too short for timestamp");
+            }
+            return message.Skip(2).Take(message.Length-2).ToArray();
+        }
+
         [Fact]
         public void NoteOn()
         {
             byte[] noteOn = new byte[] {0x90, 0x24, 0x0};
             Bridge bridge = new Bridge(data =>
             {
-                Assert.Equal(noteOn, data);
+                Assert.Equal(noteOn, RemoveTimestamp(data));
             });
             bridge.ReceiveMidiMessage(noteOn.Length, noteOn);
         }
@@ -25,7 +35,7 @@ namespace dodgyrabbit.MidiBle.Tests
             byte[] noteOff = new byte[] {0x80, 0x24, 0x0};
             Bridge bridge = new Bridge(data =>
             {
-                Assert.Empty(data);
+                Assert.True(false, "Expected message to be filtered, yet here we are");
             });
             bridge.ReceiveMidiMessage(noteOff.Length, noteOff);
         }
@@ -36,7 +46,7 @@ namespace dodgyrabbit.MidiBle.Tests
             byte[] noteOn = new byte[] {0x90, 0x24, 0x0, 0x25, 0x0};
             Bridge bridge = new Bridge(data =>
             {
-                Assert.Equal(noteOn, data);
+                Assert.Equal(noteOn, RemoveTimestamp(data));
             });
             bridge.ReceiveMidiMessage(noteOn.Length, noteOn);
         }
@@ -59,9 +69,9 @@ namespace dodgyrabbit.MidiBle.Tests
             bridge.ReceiveMidiMessage(noteOn2.Length, noteOn2);
 
             // First message includes header byte
-            Assert.Equal(noteOn1, messages[0]);
+            Assert.Equal(noteOn1, RemoveTimestamp(messages[0]));
             // This is the important bit - the second message should also have header byte
-            Assert.Equal(new byte[] {0x90, 0x25, 0x0}, messages[1]);
+            Assert.Equal(new byte[] {0x90, 0x25, 0x0}, RemoveTimestamp(messages[1]));
         }
 
         /// <summary>
@@ -80,9 +90,9 @@ namespace dodgyrabbit.MidiBle.Tests
                 activeSenseCount++;
             }, TimeSpan.FromMilliseconds(100));
 
-            bridge.Start();
+            bridge.StartActiveSense();
             Thread.Sleep(250);
-            bridge.Stop();
+            bridge.StopActiveSense();
 
             Assert.Equal(3, activeSenseCount);
         }

@@ -10,9 +10,8 @@ public class Bridge
     bool isActiveSensing = true;
     Action<byte[]> sendMidiMessage;
     TimeSpan activeSenseInterval = TimeSpan.FromMilliseconds(200);
-
+    CancellationTokenSource cancellationTokenSource;
     byte lastStatusByte = 0;
-
     object sendLock = new object();
 
     /// <summary>
@@ -26,6 +25,7 @@ public class Bridge
             throw new ArgumentNullException(nameof(sendMidiMessage), "Provide a delegate that will will be called when a MIDI message is ready to send.");
         }
         this.sendMidiMessage = sendMidiMessage;
+        stopwatch.Start();
     }
 
     public Bridge(Action<byte[]> sendMidiMessage, TimeSpan? activeSenseInterval)
@@ -51,52 +51,53 @@ public class Bridge
         ProcessMidiMessage(length, message);
     }
 
-    void Run()
+    public void StopActiveSense()
     {
-
+        lock (sendLock)
+        {
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource = null;
+        }
     }
 
-    public void Stop()
+    public void StartActiveSense()
     {
-        cancellationTokenSource.Cancel();
+        lock (sendLock)
+        {
+            if (cancellationTokenSource != null)
+            {
+                throw new InvalidOperationException("Can't start two active sense workers");
+            }
+            cancellationTokenSource = new CancellationTokenSource();
+            StartMidiHeartbeat(cancellationTokenSource.Token);
+        }
     }
 
-    public void Start()
+    // Internal, thread-safe method to call the callback when a MIDI message is ready to send
+    void SendMidiMessage(byte[] message)
     {
-
-        cancellationTokenSource = new CancellationTokenSource();
-        StartMidiHeartbeat(cancellationTokenSource.Token);
+        lock (sendLock)
+        {
+            sendMidiMessage(message);
+        }
     }
-
-    CancellationTokenSource cancellationTokenSource;
-
     public void StartMidiHeartbeat(CancellationToken cancellationToken)
         {
             Task.Run(async () =>
             {
-                var buffer = new byte[3];
+                // Active sensing message
+                var buffer = new byte[] {0xFE};
                 while (true)
                 {
-                        long millis = stopwatch.ElapsedMilliseconds;
-
-                        buffer[0] = (byte)(((millis >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
-                        buffer[1] = (byte)((millis & 0x7F) | 0x80); //7 bits plus MSB
-                        // Active sending message
-                        buffer[2] = 0xFE;
-
-                        lock (sendLock)
-                        {
-                            sendMidiMessage(buffer);
-                        }
-
+                    SendMidiMessage(AddTimestamp(buffer));
                     await Task.Delay(activeSenseInterval, cancellationToken);
                 }
             }, cancellationToken);
-
             Console.WriteLine("Exiting heartbeat");
         }
     void ProcessMidiMessage(int length, byte[] data)
     {
+        // TODO: Improve this to look for messages of this type anyhere in stream
         if (length == 1 && data[0] == 0xFE)
         {
             return;
@@ -153,7 +154,19 @@ public class Bridge
         }
         if (bytes.Count > 0)
         {
-            sendMidiMessage(bytes.ToArray());
+            SendMidiMessage(AddTimestamp(bytes.ToArray()));
         }
+    }
+
+    byte[] AddTimestamp(byte[] value)
+    {
+        var buffer = new byte[2 + value.Length];
+        long milliseconds = stopwatch.ElapsedMilliseconds;
+
+        buffer[0] = (byte)(((milliseconds >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
+        buffer[1] = (byte)((milliseconds & 0x7F) | 0x80); //7 bits plus MSB
+
+        Buffer.BlockCopy(value, 0, buffer, 2, value.Length);
+        return buffer;
     }
 }
