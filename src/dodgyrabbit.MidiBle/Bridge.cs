@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -18,7 +18,7 @@ public class Bridge
     /// Construct a new <see cref="Bridge"/> instance.
     /// </summary>
     /// <param name="sendMidiMessage">Provide a delegate that will be called when the bridge has a message to send.</param>
-    public Bridge(Action<byte[]> sendMidiMessage) : this (sendMidiMessage, null)
+    public Bridge(Action<byte[]> sendMidiMessage) : this(sendMidiMessage, null)
     {
         if (sendMidiMessage == null)
         {
@@ -73,6 +73,21 @@ public class Bridge
         }
     }
 
+    public void StartMidiHeartbeat(CancellationToken cancellationToken)
+    {
+        Task.Run(async () =>
+        {
+            // Active sensing message
+            var buffer = new byte[] {0xFE};
+            while (true)
+            {
+                SendMidiMessage(AddTimestamp(buffer));
+                await Task.Delay(activeSenseInterval, cancellationToken);
+            }
+        }, cancellationToken);
+        Console.WriteLine("Exiting heartbeat");
+    }
+
     // Internal, thread-safe method to call the callback when a MIDI message is ready to send
     void SendMidiMessage(byte[] message)
     {
@@ -81,20 +96,7 @@ public class Bridge
             sendMidiMessage(message);
         }
     }
-    public void StartMidiHeartbeat(CancellationToken cancellationToken)
-        {
-            Task.Run(async () =>
-            {
-                // Active sensing message
-                var buffer = new byte[] {0xFE};
-                while (true)
-                {
-                    SendMidiMessage(AddTimestamp(buffer));
-                    await Task.Delay(activeSenseInterval, cancellationToken);
-                }
-            }, cancellationToken);
-            Console.WriteLine("Exiting heartbeat");
-        }
+
     void ProcessMidiMessage(int length, byte[] data)
     {
         // TODO: Improve this to look for messages of this type anyhere in stream
@@ -107,7 +109,7 @@ public class Bridge
         List<byte> bytes = new List<byte>();
         for (int i = 0; i < length; i++)
         {
-            bool isStatusByte = ((data[i] & (byte)0b1000_0000) > 0);
+            bool isStatusByte = (data[i] & 0b1000_0000) > 0;
 
             if (!hasStatusByte && !isStatusByte)
             {
@@ -123,7 +125,6 @@ public class Bridge
             if (!hasStatusByte && isStatusByte)
             {
                 // New message, starting with status
-
                 if (data[i] != 128)
                 {
                     // Skip the note-off messages
@@ -163,8 +164,8 @@ public class Bridge
         var buffer = new byte[2 + value.Length];
         long milliseconds = stopwatch.ElapsedMilliseconds;
 
-        buffer[0] = (byte)(((milliseconds >> 7) & 0x3F) | (long)0x80); //6 bits plus MSB
-        buffer[1] = (byte)((milliseconds & 0x7F) | 0x80); //7 bits plus MSB
+        buffer[0] = (byte)(((milliseconds >> 7) & 0x3F) | (long)0x80); // 6 bits plus MSB
+        buffer[1] = (byte)((milliseconds & 0x7F) | 0x80); // 7 bits plus MSB
 
         Buffer.BlockCopy(value, 0, buffer, 2, value.Length);
         return buffer;

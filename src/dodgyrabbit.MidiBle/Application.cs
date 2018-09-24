@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -10,7 +10,9 @@ namespace dodgyrabbit.MidiBle
 {
     public class DummyDisposable : IDisposable
     {
-        public void Dispose() {}
+        public void Dispose()
+        {
+        }
     }
 
     public class Application : IObjectManager
@@ -18,11 +20,12 @@ namespace dodgyrabbit.MidiBle
         string basePath;
         ObjectPath objectPath;
         List<GattService1> services = new List<GattService1>();
+
         public Application(string path)
         {
             // We need to create services as children of this, so keep reference to the orignal string path
-            this.basePath = path;
-            this.objectPath = new ObjectPath(basePath);
+            basePath = path;
+            objectPath = new ObjectPath(basePath);
         }
 
         public void AddService(GattService1 service)
@@ -46,10 +49,10 @@ namespace dodgyrabbit.MidiBle
         public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             var objects = new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
+
             // TODO: The GetInterfaceName seems problematic. If we implement more than one, this may fail.
             // Better solution may be that it is returned by the object itself.
             // Alternatively we "code" it here. May be OK.
-
             foreach(GattService1 service in services)
             {
                 IDictionary<string, IDictionary<string, object>> serviceDictionary = new Dictionary<string, IDictionary<string, object>>();
@@ -73,21 +76,21 @@ namespace dodgyrabbit.MidiBle
         private string GetInterfaceName(object o)
         {
             Attribute attribute = o.GetType().GetCustomAttribute(typeof(DBusInterfaceAttribute), false);
-            DBusInterfaceAttribute dBusInterface = attribute as DBusInterfaceAttribute;
-            if (dBusInterface == null)
+            DBusInterfaceAttribute busInterfaceAttribute = attribute as DBusInterfaceAttribute;
+            if (busInterfaceAttribute == null)
             {
                 throw new InvalidOperationException("This type does not have the DBusInterfaceAttribute");
             }
-            return dBusInterface.Name;
+            return busInterfaceAttribute.Name;
         }
 
-        public Task<IDisposable>  WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
+        public Task<IDisposable> WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception> onError)
         {
             Console.WriteLine("WatchInterfacesAdded called");
             return Task.FromResult(new DummyDisposable() as IDisposable);
         }
 
-        public  Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
+        public Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception> onError)
         {
              Console.WriteLine("WatchInterfacesRemoved called");
             return Task.FromResult(new DummyDisposable() as IDisposable);

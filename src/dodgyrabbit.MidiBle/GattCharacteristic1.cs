@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Tmds.DBus;
-
-namespace dodgyrabbit.MidiBle
+﻿namespace dodgyrabbit.MidiBle
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Tmds.DBus;
+    
     public class GattCharacteristic1 : IGattCharacteristic1
     {
         ObjectPath parentPath;
