@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/dodgyrabbit/midi-ble-bridge.svg?branch=master)](https://travis-ci.com/dodgyrabbit/midi-ble-bridge)
+
 # MIDI to BLE bridge
 ## Overview
 A MIDI to Bluetooth Low Energy bridge written in C# running on Linux using .Net Core.
@@ -16,24 +18,15 @@ For now, I'm simply documenting my own setup to get things working. Hopefully I 
 ## Installation
 Follow the instructions in the [installation guide](install.md)
 
-## Blog
-My crude collection of notes on how this is progressing, what I tried, what failed and so forth.
-
-* 10 Sep 2018 [Who wants to ride DBus?](blog/002-understanding-dbus.md)
-* 9 Sep 2018 [Basics](blog/001-getting-anything-to-work.md)
-
 ## TODO
 - [x] Communicate with BlueZ via D-Bus
 - [x] Get a basic GATT advertisement working
 - [x] Advertise remaining GATT service properties
 - [x] Create a BLE service
 - [x] Register MIDI BLE service the mimics Yamaha device
-- [ ] Send a basic MIDI message (keep alive?)
-- [ ] Enable encryption
-- [ ] Figure out timing/resolution
-- [ ] How to break "package" multiple midi messages as per the spec
-- [ ] Figure out how to read MIDI messages from USB port
-- [ ] Map incoming midi to outgoing midi
-- [ ] Filter out stuff you don't want to see
-      https://github.com/atsushieno/managed-midi
-      https://dev.to/atsushieno/managed-midi-the-truly-cross-platform-net-midi-api-56hk
+- [x] Send a basic MIDI message (keep alive?)
+- [x] Figure out timing/resolution
+- [x] How to break "package" multiple midi messages as per the spec
+- [x] Figure out how to read MIDI messages from USB port
+- [x] Map incoming midi to outgoing midi
+- [x] Filter out stuff you don't want to see
