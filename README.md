@@ -30,3 +30,7 @@ Follow the instructions in the [installation guide](install.md)
 - [x] Figure out how to read MIDI messages from USB port
 - [x] Map incoming midi to outgoing midi
 - [x] Filter out stuff you don't want to see
+- [ ] Enumerate devices - disconnect if we find it's already connected (can't advertise otherwise)
+- [ ] Better encapsulation/classes for MIDI
+- [ ] Better abstraction for filtering
+
