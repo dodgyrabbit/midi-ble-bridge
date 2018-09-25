@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dodgyrabbit.MidiBle", "src\dodgyrabbit.MidiBle\dodgyrabbit.MidiBle.csproj", "{F9290DBA-4659-41F9-B0A1-15FDE520CF82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tmds.DBus", "Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj", "{04A9F7D1-D0F4-497E-B7B5-36E613EDA7DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9290DBA-4659-41F9-B0A1-15FDE520CF82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9290DBA-4659-41F9-B0A1-15FDE520CF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9290DBA-4659-41F9-B0A1-15FDE520CF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9290DBA-4659-41F9-B0A1-15FDE520CF82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04A9F7D1-D0F4-497E-B7B5-36E613EDA7DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04A9F7D1-D0F4-497E-B7B5-36E613EDA7DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04A9F7D1-D0F4-497E-B7B5-36E613EDA7DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04A9F7D1-D0F4-497E-B7B5-36E613EDA7DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

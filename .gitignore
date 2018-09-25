@@ -4,3 +4,4 @@ packages
 .vscode
 .pyc
 gatt-example/.pyc
+.idea

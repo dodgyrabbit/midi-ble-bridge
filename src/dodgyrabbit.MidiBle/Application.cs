@@ -7,13 +7,6 @@ namespace Dodgyrabbit.MidiBle
     using System.Threading.Tasks;
     using Tmds.DBus;
 
-    public class DummyDisposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-
     public class Application : IObjectManager
     {
         string basePath;

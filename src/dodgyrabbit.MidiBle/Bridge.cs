@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 public class Bridge
 {
     Stopwatch stopwatch = new Stopwatch();
-    bool isActiveSensing = true;
     Action<byte[]> sendMidiMessage;
     TimeSpan activeSenseInterval = TimeSpan.FromMilliseconds(150);
     CancellationTokenSource cancellationTokenSource;

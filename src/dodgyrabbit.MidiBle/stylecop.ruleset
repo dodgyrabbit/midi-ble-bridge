@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Rules for StyleCop.Analyzers" Description="Code analysis rules for StyleCop.Analyzers.csproj." ToolsVersion="14.0">
+   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA1305" Action="Warning" />
+    <Rule Id="SA1412" Action="Warning" />
+    <Rule Id="SA1600" Action="None" />
+    <Rule Id="SA1609" Action="Warning" />
+
+    <!-- Blank line -->
+    <Rule Id="SA1201" Action="None" />
+
+    <Rule Id="SA1400" Action="None" />
+
+    <!-- Ignore header file -->
+    <Rule Id="SA1633" Action="None" />
+
+    <!-- XML comments -->
+    <Rule Id="SA1652" Action="None" />
+    
+    <!-- Prefix local calls with this -->
+    <Rule Id="SA1101" Action="None" />
+    
+    <!-- Closing brace followed by newline -->
+    <Rule Id="SA1513" Action="None" />
+
+    <!-- Closing parenthesis must be followed by a space -->
+    <Rule Id="SA1009" Action="None" />
+
+    <!-- Constructor initializers on own row -->
+    <Rule Id="SA1128" Action="None" />
+
+    <!-- Opening brace must be followed by a space -->
+    <Rule Id="SA1012" Action="None" />
+
+    <!-- Closing brace preceded by space -->
+    <Rule Id="SA1013" Action="None" />
+
+      <!-- Semicolons must be followed by a space -->
+      <Rule Id="SA1002" Action="None" />
+  </Rules>
+</RuleSet>
