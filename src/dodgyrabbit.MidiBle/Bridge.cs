@@ -75,16 +75,18 @@ public class Bridge
 
     public void StartMidiHeartbeat(CancellationToken cancellationToken)
     {
-        Task.Run(async () =>
-        {
-            // Active sensing message
-            var buffer = new byte[] {0xFE};
-            while (true)
+        Task.Run(
+            async () =>
             {
-                SendMidiMessage(AddTimestamp(buffer));
-                await Task.Delay(activeSenseInterval, cancellationToken);
-            }
-        }, cancellationToken);
+                // Active sensing message
+                var buffer = new byte[] {0xFE};
+                while (true)
+                {
+                    SendMidiMessage(AddTimestamp(buffer));
+                    await Task.Delay(activeSenseInterval, cancellationToken);
+                }
+            },
+            cancellationToken);
         Console.WriteLine("Exiting heartbeat");
     }
 

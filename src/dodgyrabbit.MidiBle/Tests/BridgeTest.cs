@@ -1,4 +1,4 @@
-﻿namespace dodgyrabbit.MidiBle.Tests
+﻿namespace Dodgyrabbit.MidiBle.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -77,12 +77,14 @@
         public void ActiveSense()
         {
             int activeSenseCount = 0;
-            Bridge bridge = new Bridge(data =>
-            {
-                Assert.Equal(3, data.Length);
-                Assert.Equal(0xFE, data[2]);
-                activeSenseCount++;
-            }, TimeSpan.FromMilliseconds(100));
+            Bridge bridge = new Bridge(
+                data =>
+                {
+                    Assert.Equal(3, data.Length);
+                    Assert.Equal(0xFE, data[2]);
+                    activeSenseCount++;
+                },
+                TimeSpan.FromMilliseconds(100));
 
             bridge.StartActiveSense();
             Thread.Sleep(250);

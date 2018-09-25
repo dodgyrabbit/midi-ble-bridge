@@ -47,6 +47,7 @@
                     Console.WriteLine($"{value[0]},{value[1]},{value[2]}");
                 }
                 this.value = value;
+
                 // TODO: do more testing to determine if it's needed for the Notification request to come in first.
                 if (isRunning)
                 {

@@ -8,9 +8,8 @@
     [DBusInterface("org.bluez.GattService1")]
     public class GattService1 : IDBusObject, IGattService1
     {
-        ObjectPath applicationPath;
-        ObjectPath objectPath;
         readonly List<GattCharacteristic1> gattCharacteristics = new List<GattCharacteristic1>();
+        ObjectPath objectPath;
 
         public GattService1(ObjectPath parentPath, int index, string uuid, bool primary)
         {
@@ -47,8 +46,8 @@
             return Task.FromResult<IDictionary<string, object>>(
                 new Dictionary<string, object>()
                 {
-                    { nameof(UUID), UUID},
-                    { nameof(Primary), Primary}
+                    {nameof(UUID), UUID},
+                    {nameof(Primary), Primary}
                 });
         }
     }

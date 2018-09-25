@@ -61,13 +61,7 @@
                     await connection.RegisterObjectAsync(advertisement);
 
                     var advertisingManager = connection.CreateProxy<ILEAdvertisingManager1>(serviceName, hci0Path);
-                    try {
                     await advertisingManager.RegisterAdvertisementAsync(advertisement, new Dictionary<string, object>());
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Could not advertise. Already connected?");
-                    }
 
                     Application application = new Application(@"/org/bluez/example");
                     GattService1 service = new GattService1(application.ObjectPath, 0, "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", true);
