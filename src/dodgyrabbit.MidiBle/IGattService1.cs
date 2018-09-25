@@ -1,4 +1,4 @@
-﻿namespace dodgyrabbit.MidiBle
+﻿namespace Dodgyrabbit.MidiBle
 {
     using Tmds.DBus;
 

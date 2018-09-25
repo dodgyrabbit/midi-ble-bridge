@@ -1,4 +1,4 @@
-﻿namespace dodgyrabbit.MidiBle
+﻿namespace Dodgyrabbit.MidiBle
 {
     using System;
     using System.Collections.Generic;
@@ -42,8 +42,12 @@
 
             set
             {
-                Console.WriteLine($"{value[0]},{value[1]},{value[2]}");
+                if (value[2] != 254)
+                {
+                    Console.WriteLine($"{value[0]},{value[1]},{value[2]}");
+                }
                 this.value = value;
+                // TODO: do more testing to determine if it's needed for the Notification request to come in first.
                 if (isRunning)
                 {
                     OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(Value), value));

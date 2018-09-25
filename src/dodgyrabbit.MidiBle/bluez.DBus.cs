@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using dodgyrabbit.MidiBle;
+using Dodgyrabbit.MidiBle;
 using Tmds.DBus;
 
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
-namespace dodgyrabbit.MidiBle
+namespace Dodgyrabbit.MidiBle
 {
     [DBusInterface("org.bluez.LEAdvertisement1")]
     interface ILEAdvertisement1 : IDBusObject

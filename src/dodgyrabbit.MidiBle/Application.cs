@@ -1,5 +1,5 @@
 ﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
-namespace dodgyrabbit.MidiBle
+namespace Dodgyrabbit.MidiBle
 {
     using System;
     using System.Collections.Generic;
