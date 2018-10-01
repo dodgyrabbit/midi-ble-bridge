@@ -33,4 +33,5 @@ Follow the instructions in the [installation guide](install.md)
 - [ ] Enumerate devices - disconnect if we find it's already connected (can't advertise otherwise)
 - [ ] Better encapsulation/classes for MIDI
 - [ ] Better abstraction for filtering
+- [ ] Refactor properties out of DBus interfaces
 
